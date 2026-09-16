@@ -9,8 +9,8 @@
 A web application with a Python backend, in which the dungeon master is an
 agent with explicit tools ([ADR-0002](adr/0002-application-form-factor.md)).
 The players sit at one table and share one client view. Adventure content is
-private and loaded at runtime from outside this repository
-([ADR-0003](adr/0003-adventure-content-separation.md), proposed).
+private, lives in its own repository, and is loaded at runtime through a
+port rather than a path ([ADR-0003](adr/0003-adventure-content-separation.md)).
 
 ```mermaid
 flowchart TD
@@ -24,20 +24,29 @@ flowchart TD
         tools["Tool layer<br/>the only way durable state changes"]
         rules["Rules core<br/>pure, deterministic, no model calls"]
         state["Session state<br/>party · adventure progress · what is known"]
-        loader["Adventure loader"]
+        repo["AdventureRepository (port)<br/>+ asset endpoint with reveal check"]
     end
 
     model["Claude model API"]
-    content[("Private adventure content<br/>outside this repository")]
+
+    subgraph private["Private repository"]
+        content[("Adventure package<br/>manifest · scenes · npcs · assets")]
+    end
+
+    subgraph offline["Offline, run once per adventure"]
+        book["Scanned book"] --> pipeline["Ingest pipeline<br/>(public repo, no content)"]
+        pipeline --> content
+    end
 
     players <--> client
     client <--> orch
+    client -->|"asset requests"| repo
     orch <--> model
     orch --> tools
     tools --> rules
     tools --> state
-    tools --> loader
-    loader --> content
+    tools --> repo
+    repo --> content
 ```
 
 ## Components
@@ -67,8 +76,20 @@ iterations as responsibility moves out of the model
 progress, what the players have learned. Narrative texture that need not
 survive stays in the model's context and is deliberately not modelled here.
 
-**Adventure loader.** Reads structured adventure files from a location
-outside this repository and exposes them to the tool layer.
+**AdventureRepository.** A port, not a path. The engine asks for a scene, an
+NPC or an asset by identity; the filesystem implementation resolves that
+against an adventure package directory whose location comes from
+configuration. Tests use an in-memory implementation with original or SRD
+content, so the engine is fully testable with no private content present.
+
+Assets never reach the client as static files. They are served by an
+endpoint that checks the current reveal state first, so a map the party has
+not found cannot be fetched by guessing a URL.
+
+**Ingest pipeline.** A separate offline tool in this repository. It turns a
+prepared source into an adventure package that validates against the
+schemas in `schemas/adventure/`. It contains no adventure material, and its
+test fixtures must be original or SRD content.
 
 ## Decisions
 
@@ -76,12 +97,13 @@ outside this repository and exposes them to the tool layer.
 | --- | --- | --- |
 | Record architecture decisions | [ADR-0001](adr/0001-record-architecture-decisions.md) | accepted |
 | Application form factor | [ADR-0002](adr/0002-application-form-factor.md) | accepted |
-| Adventure content separation | [ADR-0003](adr/0003-adventure-content-separation.md) | proposed |
+| Adventure content separation | [ADR-0003](adr/0003-adventure-content-separation.md) | accepted |
 | Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | proposed |
 | Concrete web stack | ADR-0005 | not yet written |
 
 ## Open
 
+- The v1 adventure schema is iteration work, not yet defined.
 - The concrete web stack — HTTP framework, client framework, transport for
   streaming narration — is deferred until iteration 1 is scoped.
 - The initial tool surface of the dungeon master agent is defined as part of

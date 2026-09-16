@@ -18,5 +18,5 @@ options considered, the choice made, and the consequences accepted with it.
 | --- | --- | --- |
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | accepted |
 | [0002](0002-application-form-factor.md) | Application form factor | accepted |
-| [0003](0003-adventure-content-separation.md) | Adventure content separation | proposed |
+| [0003](0003-adventure-content-separation.md) | Adventure content separation | accepted |
 | [0004](0004-character-state-ownership.md) | Character state ownership | proposed |
