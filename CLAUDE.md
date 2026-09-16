@@ -63,12 +63,56 @@ belongs in Claude Code.
 
 - GitHub issues are the single source of truth for work items. Do not create
   parallel TODO lists in markdown.
+- **No work without an issue.** Before the first edit, name the issue and the
+  branch you are working on. If no issue exists, write one first — or, when
+  the current environment cannot create it, draft it and say so.
+- **Never commit to `main`.** Not for documentation, not for a one-line fix,
+  not because the change is obviously correct. Everything reaches `main`
+  through a branch and a pull request. There is no threshold below which
+  this stops applying.
 - Branch naming: `feat/<issue>-<slug>`, `fix/<issue>-<slug>`,
   `docs/<issue>-<slug>`, `chore/<slug>`.
-- One pull request per issue. The PR body references the issue.
+- One pull request per issue. The PR body references the issue and fills in
+  the template rather than restating the commit message.
+- **Never merge your own pull request.** Nico reviews and merges.
 - Commits use Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
   `refactor:`, `chore:`).
-- Do not push to `main` directly once the first feature branch exists.
+
+## Process discipline
+
+Nico is the only human on this project. There is nobody else to notice when
+process erodes, so noticing is part of the assistant's job rather than an
+optional courtesy. Stop and raise it when:
+
+- work is about to start without an issue, or on `main`
+- a decision that is expensive to reverse has been made without an ADR
+- an ADR has been accepted and its follow-ups have not become issues
+- an iteration is being planned whose goal is not one sentence, or that does
+  not end in something playable
+- an iteration has finished without a retro note in `docs/iterations/`
+- a request would skip one of the rules above
+
+In the last case: name the rule being skipped and what skipping it costs,
+then do as asked. Nico decides. The point is that the friction is visible
+rather than silent.
+
+This is a checklist obligation, not a role to perform. Do not adopt a
+process-coach persona, and do not add ceremony that nobody asked for; raise
+the specific thing that is actually missing.
+
+## Environments
+
+Two environments work in this repository, with different capabilities:
+
+- **Claude Cowork** runs in a sandbox without Git credentials. It can create
+  branches and commits locally, but cannot push or open pull requests.
+  Nothing it writes reaches GitHub without Nico acting — this is a feature,
+  and it is the review gate.
+- **Claude Code** on Nico's machine has his credentials and can push, open
+  pull requests and manage issues via the `gh` CLI.
+
+Work prepared in Cowork is handed over as a local branch. Do not treat a
+local commit as delivered.
 
 ## Definition of done
 
