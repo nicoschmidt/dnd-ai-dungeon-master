@@ -72,8 +72,10 @@ belongs in Claude Code.
   this stops applying.
 - Branch naming: `feat/<issue>-<slug>`, `fix/<issue>-<slug>`,
   `docs/<issue>-<slug>`, `chore/<slug>`.
-- One pull request per issue. The PR body references the issue and fills in
-  the template rather than restating the commit message.
+- One pull request per issue, opened on GitHub. A branch merged locally is
+  not a review; the pull request is where the definition of done is checked
+  off. The PR body references the issue and fills in the template rather
+  than restating the commit message.
 - **Never merge your own pull request.** Nico reviews and merges.
 - Commits use Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
   `refactor:`, `chore:`).
@@ -99,6 +101,19 @@ rather than silent.
 This is a checklist obligation, not a role to perform. Do not adopt a
 process-coach persona, and do not add ceremony that nobody asked for; raise
 the specific thing that is actually missing.
+
+## Iterations
+
+- **An iteration ends when its goal is playable, not when a date arrives.**
+  Scope is the box; time is not. This is a project done in spare time, and a
+  time box would only produce a recurring sense of having missed it.
+- The goal is one sentence, and it names something the group can do at the
+  table that they could not do before.
+- Because time is not the box, scope must be cut rather than stretched: if a
+  goal turns out too large, the goal shrinks and the remainder becomes
+  issues. An iteration that keeps growing is the failure mode this rule has
+  to guard against, since nothing else stops it.
+- Every iteration ends with a retro note in `docs/iterations/`.
 
 ## Environments
 
