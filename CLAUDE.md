@@ -41,8 +41,10 @@ technology choices, interface and data-format decisions, deployment shape,
 and anything that crosses a component boundary.
 
 - Format: MADR, see `docs/adr/0000-template.md`
-- ADRs are immutable once accepted. To change a decision, write a new ADR
-  and set the old one to `superseded by ADR-XXXX`.
+- An accepted ADR is immutable in substance: its decision, reasoning and
+  consequences are never rewritten. To change a decision, write a new ADR and
+  set the old one to `superseded by ADR-XXXX`. Typographic fixes, broken links
+  and redaction of personal data may be corrected in place.
 - `docs/architecture.md` is derived from accepted ADRs and is updated in the
   same commit that accepts one.
 
@@ -76,13 +78,13 @@ belongs in Claude Code.
   not a review; the pull request is where the definition of done is checked
   off. The PR body references the issue and fills in the template rather
   than restating the commit message.
-- **Never merge your own pull request.** Nico reviews and merges.
+- **Never merge your own pull request.** The maintainer reviews and merges.
 - Commits use Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
   `refactor:`, `chore:`).
 
 ## Process discipline
 
-Nico is the only human on this project. There is nobody else to notice when
+The maintainer is the only human on this project. There is nobody else to notice when
 process erodes, so noticing is part of the assistant's job rather than an
 optional courtesy. Stop and raise it when:
 
@@ -95,7 +97,7 @@ optional courtesy. Stop and raise it when:
 - a request would skip one of the rules above
 
 In the last case: name the rule being skipped and what skipping it costs,
-then do as asked. Nico decides. The point is that the friction is visible
+then do as asked. The maintainer decides. The point is that the friction is visible
 rather than silent.
 
 This is a checklist obligation, not a role to perform. Do not adopt a
@@ -121,9 +123,9 @@ Two environments work in this repository, with different capabilities:
 
 - **Claude Cowork** runs in a sandbox without Git credentials. It can create
   branches and commits locally, but cannot push or open pull requests.
-  Nothing it writes reaches GitHub without Nico acting — this is a feature,
+  Nothing it writes reaches GitHub without the maintainer acting — this is a feature,
   and it is the review gate.
-- **Claude Code** on Nico's machine has his credentials and can push, open
+- **Claude Code** on the maintainer's machine has their credentials and can push, open
   pull requests and manage issues via the `gh` CLI.
 
 Work prepared in Cowork is handed over as a local branch. Do not treat a
@@ -151,6 +153,6 @@ A change is done when all of these hold:
 ## Style
 
 - Repository language is English: code, comments, docs, commit messages,
-  issues. Conversations with Nico may be in German.
+  issues. Conversations with the maintainer may be in German.
 - Prefer boring, explicit solutions over clever ones.
 - When uncertain about a requirement, ask rather than guess.

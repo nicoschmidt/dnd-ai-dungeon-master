@@ -2,7 +2,7 @@
 
 - **Status:** accepted
 - **Date:** 2026-09-13
-- **Deciders:** Nico Schmidt
+- **Deciders:** Maintainer
 - **Supersedes:** —
 - **Superseded by:** —
 
