@@ -27,9 +27,13 @@ The maintainer owns every step that reaches GitHub. They do not have to compose 
 
 For each manual step the assistant hands over the finished artefact and the
 command to run it: the issue text, the pull request body, the exact
-`git`/`gh` invocation with real numbers and paths filled in. Drafted bodies
-are written beside the repository (`../pr-<n>-body.md`, `../create-*.sh`),
-never committed — inside the repository they would be a second task list.
+`git`/`gh` invocation with real numbers and paths filled in. Board fields
+count as part of that: a new issue arrives with `Größe` and `Iteration`
+already set by `gh project item-edit`, because both are facts about the work.
+`Status` is not set for the maintainer — it is a judgement about whether the
+work is ready, in review or done. Drafted bodies are written beside the
+repository (`../pr-<n>-body.md`, `../create-*.sh`), never committed — inside
+the repository they would be a second task list.
 
 So the maintainer's part is: read it, judge it, paste it. If a command arrives with a
 placeholder still in it, or a step arrives as an instruction rather than a
@@ -43,10 +47,20 @@ push is the gate, not the branch.
 
 1. **Issue.** Use a template: feature, bug or spike. Acceptance criteria are
    statements that can be checked, not intentions.
-   → *Handed over:* the issue body and a ready `gh issue create` block. The
-   maintainer reads the body and pastes the block.
+   → *Handed over:* the issue body and a ready block that creates the issue,
+   puts it on the board and sets `Größe` and `Iteration`. `Typ` comes from the
+   label. The maintainer reads the body and pastes the block.
+
+   The block needs the `project` scope, which `gh auth login` does not grant
+   by default:
+
+   ```bash
+   gh auth refresh -s project
+   ```
+
 2. **`Ready`.** The criteria are clear enough that work could start today.
-   → *The maintainer's click on the board.* Nothing to paste.
+   → *The maintainer's click on the board.* Nothing to paste, and deliberately
+   so: `Status` is the one board field that is a judgement rather than a fact.
 3. **Branch.** `feat/<issue>-<slug>`, `fix/…`, `docs/…`, `chore/<slug>`.
    Usually created by the assistant so it can commit; never work on `main`.
    → *Nothing to do.* The branch name is reported; it stays local until step 5.
