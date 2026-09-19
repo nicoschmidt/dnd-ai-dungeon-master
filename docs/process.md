@@ -43,30 +43,30 @@ push is the gate, not the branch.
 
 1. **Issue.** Use a template: feature, bug or spike. Acceptance criteria are
    statements that can be checked, not intentions.
-   → *Handed to you:* the issue body and a ready `gh issue create` block.
-   Read the body, paste the block.
+   → *Handed over:* the issue body and a ready `gh issue create` block. The
+   maintainer reads the body and pastes the block.
 2. **`Ready`.** The criteria are clear enough that work could start today.
-   → *Your click on the board.* Nothing to paste.
+   → *The maintainer's click on the board.* Nothing to paste.
 3. **Branch.** `feat/<issue>-<slug>`, `fix/…`, `docs/…`, `chore/<slug>`.
    Usually created by the assistant so it can commit; never work on `main`.
-   → *Nothing to do.* You are told the branch name; it is local until step 5.
+   → *Nothing to do.* The branch name is reported; it stays local until step 5.
 4. **Work.** Cowork for product and architecture questions; Claude Code for
    work against existing code. Rule of thumb: if answering needs the
    codebase, it belongs in Claude Code.
 5. **`In review`.** Push the branch, open the pull request in the repository
    view (Code tab → "Compare & pull request"), put `Closes #<n>` in the body.
-   → *Handed to you:* the pull request body as `../pr-<n>-body.md`, plus
-   `git push` and `gh pr create --body-file …` with the values filled in.
-   Read the body first — it is what reviewers see — then run both.
+   → *Handed over:* the pull request body as `../pr-<n>-body.md`, plus
+   `git push` and `gh pr create --body-file …` with the values filled in. The
+   maintainer reads the body first — it is what reviewers see — then runs both.
 6. **Review.** Tick the template's checklist for real. Line-level changes are
    easiest as review suggestions; questions about the goal belong on the
    issue; open-ended "is this even right" belongs in a Cowork session.
-   → *Yours alone.* Nothing is handed over here, by design.
+   → *The maintainer's alone.* Nothing is handed over here, by design.
 7. **Merge.** The maintainer merges. The assistant never merges its own pull request.
-   → *Yours alone.*
+   → *The maintainer's alone.*
 8. **After.** Clean up and move the card to `Done` (automatic if the "Item
    closed" workflow is enabled).
-   → *Handed to you:* this block, with `<branch>` already substituted.
+   → *Handed over:* this block, with `<branch>` already substituted.
 
    ```bash
    git checkout main && git pull
