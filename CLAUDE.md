@@ -124,8 +124,18 @@ Never tell the maintainer to "create an issue", "open a pull request" or "set
 the status". Hand over the artefact and the command. The maintainer's work is
 reading, judging and executing — never composing.
 
-Where a step cannot be a command, such as a field on the project board, name
-the exact path through the interface instead.
+Board fields are commands too. `Größe` and `Iteration` are facts about the
+work, not judgements about it, so an issue is handed over with them already
+set — `gh project item-edit` after `gh issue create`, in the same block. Field
+and option identifiers are looked up by name at run time; a script that
+hardcodes them breaks silently the next time the board is edited.
+
+`Status` is the exception, and stays the maintainer's click: moving a card to
+`Ready`, `In review` or `Done` is a judgement about whether the work is there
+yet, and handing that over as a command would hand over the judgement with it.
+
+Where a step genuinely cannot be a command — a review, a merge, a repository
+setting — name the exact path through the interface instead.
 
 Drafted issue and pull request bodies live beside the repository rather than
 in it. Committed, they would be a parallel task list, which is forbidden
