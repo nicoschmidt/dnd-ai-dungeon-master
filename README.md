@@ -17,6 +17,8 @@ Early. The foundational architecture decisions are still open; see
 - [Decision records](docs/adr/README.md)
 - [Process](docs/process.md) — how work moves from issue to merge
 - [Working agreements for AI assistants](CLAUDE.md)
+- [Handover scripts](scripts/README.md) — the tooling behind the steps that
+  reach GitHub
 
 ## Adventure content
 

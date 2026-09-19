@@ -31,9 +31,13 @@ command to run it: the issue text, the pull request body, the exact
 count as part of that: a new issue arrives with its size and iteration already
 set by `gh project item-edit`, because both are facts about the work. Status
 is not set for the maintainer — it is a judgement about whether the work is
-ready, in review or done. Drafted bodies are written beside the
-repository (`../pr-<n>-body.md`, `../create-*.sh`), never committed — inside
-the repository they would be a second task list.
+ready, in review or done.
+
+Drafted bodies are written beside the repository (`../pr-<n>-body.md`,
+`../create-*.sh`) and never committed — inside it they would be a second task
+list. The tooling those blocks use is the opposite case and lives in the
+repository under `scripts/`, where it is reviewed and versioned along with the
+rules it implements.
 
 So the maintainer's part is: read it, judge it, paste it. If a command arrives with a
 placeholder still in it, or a step arrives as an instruction rather than a
@@ -51,8 +55,8 @@ push is the gate, not the branch.
    puts it on the board and sets its size and iteration. The type field comes
    from the label. The maintainer reads the body and pastes the block.
 
-   The block needs the `project` scope, which `gh auth login` does not grant
-   by default:
+   The block calls the helpers in `scripts/`, and needs the `project` scope,
+   which `gh auth login` does not grant by default:
 
    ```bash
    gh auth refresh -s project
@@ -142,7 +146,7 @@ the authority and the script is not. Print what the board actually has, then
 fix the script:
 
 ```bash
-bash "../show-board.sh"
+bash scripts/show-board.sh
 ```
 
 **An adventure file has landed in this repository.** Remove it before the
