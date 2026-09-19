@@ -11,6 +11,8 @@ agent with explicit tools ([ADR-0002](adr/0002-application-form-factor.md)).
 The players sit at one table and share one client view. Adventure content is
 private, lives in its own repository, and is loaded at runtime through a
 port rather than a path ([ADR-0003](adr/0003-adventure-content-separation.md)).
+At the table the whole thing is one process: `uvicorn` serves the API and the
+built client together ([ADR-0005](adr/0005-concrete-web-stack.md)).
 
 ```mermaid
 flowchart TD
@@ -39,7 +41,8 @@ flowchart TD
     end
 
     players <--> client
-    client <--> orch
+    orch -->|"narration + state (SSE)"| client
+    client -->|"declared actions (POST)"| orch
     client -->|"asset requests"| repo
     orch <--> model
     orch --> tools
@@ -51,14 +54,28 @@ flowchart TD
 
 ## Components
 
-**Web client.** The shared surface at the table. In the first iteration it
-renders narration and takes input; the party status panel follows early, the
-map grid later. It renders only what the backend sends it, which is how
-hidden information stays hidden.
+**Web client.** The shared surface at the table. React with Vite and
+TypeScript ([ADR-0005](adr/0005-concrete-web-stack.md)). In the first iteration
+it renders narration and takes input; the party status panel follows early, the
+map grid later. It renders only what the backend sends it, which is how hidden
+information stays hidden. It receives state, never markup, which is what keeps
+it replaceable — by a client on a tablet, or eventually a native one — without
+the backend changing.
+
+**Transport.** Server-Sent Events carry everything the table sees: narration
+arrives as `narration_delta`, durable state as `party_updated` and its
+siblings. The status panel renders from the state events and from nothing else,
+so a number on the panel always came through a tool. A declared action and the
+dice the player rolled go back as an ordinary `POST`. Event ids and the
+browser's own `Last-Event-ID` carry a session across a dropped connection.
+See [ADR-0005](adr/0005-concrete-web-stack.md).
 
 **Session orchestration.** Runs the dungeon master agent via the Claude Agent
 SDK: builds its context, streams narration to the client, and exposes the
-tool surface. This is the only component that depends on the Agent SDK.
+tool surface. This is the only component that depends on the Agent SDK. The
+HTTP surface around it is FastAPI, confined to a thin API layer: neither the
+rules core nor session state imports a web framework or the SDK, and CI fails a
+build that breaks that boundary ([ADR-0005](adr/0005-concrete-web-stack.md)).
 
 **Tool layer.** The contract between the agent and everything durable. The
 agent narrates and decides; it does not mutate state by describing a
@@ -110,15 +127,18 @@ test fixtures must be original or SRD content.
 | Application form factor | [ADR-0002](adr/0002-application-form-factor.md) | accepted |
 | Adventure content separation | [ADR-0003](adr/0003-adventure-content-separation.md) | accepted |
 | Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | accepted |
-| Concrete web stack | ADR-0005 | not yet written |
+| Concrete web stack | [ADR-0005](adr/0005-concrete-web-stack.md) | accepted |
 
 ## Open
 
 - The v1 adventure schema is iteration work, not yet defined.
-- The concrete web stack — HTTP framework, client framework, transport for
-  streaming narration — is deferred until iteration 1 is scoped.
 - The initial tool surface of the dungeon master agent is defined as part of
-  iteration 1 planning.
+  iteration 1 planning. It is the same piece of work as the event contract,
+  because every tool that changes durable state produces an event
+  ([ADR-0005](adr/0005-concrete-web-stack.md)).
+- How a player interrupts a turn while narration is still being generated. The
+  transport cannot carry it today, deliberately
+  ([ADR-0005](adr/0005-concrete-web-stack.md)).
 - Whether limited resources — spell slots, rage uses, hit dice — ever cross
   into the state the system owns. They are outside it today
   ([ADR-0004](adr/0004-character-state-ownership.md)).
