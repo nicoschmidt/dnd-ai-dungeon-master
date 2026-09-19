@@ -18,7 +18,7 @@ defect to fix, not a choice to make.
 | A pull request was merged | Run the cleanup block in step 8 below, card to `Done`. |
 | A decision that is hard to reverse | Write the ADR **before** the code. See `docs/adr/README.md`. |
 | An iteration goal is playable | Write the retro note in `docs/iterations/`, close the epic. |
-| Something feels too big | Set `Größe: L`. It must be cut before it enters an iteration. |
+| Something feels too big | Set its size to `L`. It must be cut before it enters an iteration. |
 | Maintainer has lost the thread | Open the project board, filter `Status: In progress`. That is what is actually started. |
 
 ## What the maintainer gets handed, and what they do
@@ -28,10 +28,10 @@ The maintainer owns every step that reaches GitHub. They do not have to compose 
 For each manual step the assistant hands over the finished artefact and the
 command to run it: the issue text, the pull request body, the exact
 `git`/`gh` invocation with real numbers and paths filled in. Board fields
-count as part of that: a new issue arrives with `Größe` and `Iteration`
-already set by `gh project item-edit`, because both are facts about the work.
-`Status` is not set for the maintainer — it is a judgement about whether the
-work is ready, in review or done. Drafted bodies are written beside the
+count as part of that: a new issue arrives with its size and iteration already
+set by `gh project item-edit`, because both are facts about the work. Status
+is not set for the maintainer — it is a judgement about whether the work is
+ready, in review or done. Drafted bodies are written beside the
 repository (`../pr-<n>-body.md`, `../create-*.sh`), never committed — inside
 the repository they would be a second task list.
 
@@ -48,8 +48,8 @@ push is the gate, not the branch.
 1. **Issue.** Use a template: feature, bug or spike. Acceptance criteria are
    statements that can be checked, not intentions.
    → *Handed over:* the issue body and a ready block that creates the issue,
-   puts it on the board and sets `Größe` and `Iteration`. `Typ` comes from the
-   label. The maintainer reads the body and pastes the block.
+   puts it on the board and sets its size and iteration. The type field comes
+   from the label. The maintainer reads the body and pastes the block.
 
    The block needs the `project` scope, which `gh auth login` does not grant
    by default:
@@ -60,7 +60,7 @@ push is the gate, not the branch.
 
 2. **`Ready`.** The criteria are clear enough that work could start today.
    → *The maintainer's click on the board.* Nothing to paste, and deliberately
-   so: `Status` is the one board field that is a judgement rather than a fact.
+   so: status is the one board field that is a judgement rather than a fact.
 3. **Branch.** `feat/<issue>-<slug>`, `fix/…`, `docs/…`, `chore/<slug>`.
    Usually created by the assistant so it can commit; never work on `main`.
    → *Nothing to do.* The branch name is reported; it stays local until step 5.
@@ -136,6 +136,14 @@ growth.
 **The maintainer notices a decision was made without an ADR.** Stop, write it, then
 continue. An ADR written afterwards is worth much less, because the options
 not taken are already forgotten.
+
+**A handover script says a field or an option does not exist.** The board is
+the authority and the script is not. Print what the board actually has, then
+fix the script:
+
+```bash
+bash "../show-board.sh"
+```
 
 **An adventure file has landed in this repository.** Remove it before the
 commit is pushed. If it was already pushed, the history has to be rewritten —

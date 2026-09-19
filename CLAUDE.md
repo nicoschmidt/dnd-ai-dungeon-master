@@ -124,13 +124,22 @@ Never tell the maintainer to "create an issue", "open a pull request" or "set
 the status". Hand over the artefact and the command. The maintainer's work is
 reading, judging and executing — never composing.
 
-Board fields are commands too. `Größe` and `Iteration` are facts about the
-work, not judgements about it, so an issue is handed over with them already
-set — `gh project item-edit` after `gh issue create`, in the same block. Field
-and option identifiers are looked up by name at run time; a script that
-hardcodes them breaks silently the next time the board is edited.
+Board fields are commands too. Size and iteration are facts about the work,
+not judgements about it, so an issue is handed over with them already set —
+`gh project item-edit` after `gh issue create`, in the same block.
 
-`Status` is the exception, and stays the maintainer's click: moving a card to
+Field and option names come from the board itself, read at run time. Not from
+memory, and not from an older script: those are where a wrong name comes from.
+Identifiers are resolved from the names rather than hardcoded, and a lookup
+that fails prints what the board does have instead of passing over the field.
+
+A handover script that writes to GitHub is exercised against a stand-in for
+`gh` before it is handed over, and fails loudly rather than reporting a
+success it did not achieve. This environment has no credentials, so a script
+it hands over has otherwise never run at all — and the maintainer discovering
+that by pasting it is not a review gate, it is a waste of their evening.
+
+Status is the exception and stays the maintainer's click: moving a card to
 `Ready`, `In review` or `Done` is a judgement about whether the work is there
 yet, and handing that over as a command would hand over the judgement with it.
 
