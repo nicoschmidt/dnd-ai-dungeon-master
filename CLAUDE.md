@@ -104,6 +104,37 @@ This is a checklist obligation, not a role to perform. Do not adopt a
 process-coach persona, and do not add ceremony that nobody asked for; raise
 the specific thing that is actually missing.
 
+## Handover
+
+The maintainer performs every step that reaches GitHub: writing issues,
+setting status, pushing, opening pull requests, reviewing, merging, cleaning
+up. Those steps are gates, and they stay manual deliberately.
+
+Manual does not mean unassisted. **Every manual step is handed over ready to
+run.** For each one, provide:
+
+- the exact text, where text is needed — issue body, pull request body —
+  written to a file beside the repository, never inside it
+- the exact command as a copy-paste block, with real values already filled
+  in: real issue numbers, real branch names, real paths, no placeholders the
+  maintainer has to resolve
+- the steps in the order they must be executed
+
+Never tell the maintainer to "create an issue", "open a pull request" or "set
+the status". Hand over the artefact and the command. The maintainer's work is
+reading, judging and executing — never composing.
+
+Where a step cannot be a command, such as a field on the project board, name
+the exact path through the interface instead.
+
+Drafted issue and pull request bodies live beside the repository rather than
+in it. Committed, they would be a parallel task list, which is forbidden
+above.
+
+One exception, by necessity: the assistant creates the local branch itself,
+because it cannot commit without one. A local branch reaches nobody, so it is
+not a gate — the push is. The maintainer is free to rename or discard it.
+
 ## Iterations
 
 - **An iteration ends when its goal is playable, not when a date arrives.**

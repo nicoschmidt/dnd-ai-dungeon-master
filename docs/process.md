@@ -15,11 +15,30 @@ defect to fix, not a choice to make.
 | An idea, but not now | Issue in `Backlog`. Do not create a branch. |
 | Work was prepared in a Cowork session | Read the local branch diff, push it, open the pull request. |
 | A pull request is open | Review it, tick the definition of done, merge. |
-| A pull request was merged | Delete the branch, `git checkout main && git pull`, card to `Done`. |
+| A pull request was merged | Run the cleanup block in step 8 below, card to `Done`. |
 | A decision that is hard to reverse | Write the ADR **before** the code. See `docs/adr/README.md`. |
 | An iteration goal is playable | Write the retro note in `docs/iterations/`, close the epic. |
 | Something feels too big | Set `Größe: L`. It must be cut before it enters an iteration. |
 | You have lost the thread | Open the project board, filter `Status: In progress`. That is what is actually started. |
+
+## What you get handed, and what you do
+
+You own every step that reaches GitHub. You do not have to compose any of
+them.
+
+For each manual step the assistant hands over the finished artefact and the
+command to run it: the issue text, the pull request body, the exact
+`git`/`gh` invocation with real numbers and paths filled in. Drafted bodies
+are written beside the repository (`../pr-<n>-body.md`, `../create-*.sh`),
+never committed — inside the repository they would be a second task list.
+
+So your part is: read it, judge it, paste it. If a command arrives with a
+placeholder still in it, or a step arrives as an instruction rather than a
+command, that is a defect — say so.
+
+The one thing the assistant does itself is creating the local branch, because
+it cannot commit without one. Nothing has reached GitHub at that point; the
+push is the gate, not the branch.
 
 ## The standard cycle
 
@@ -27,7 +46,7 @@ defect to fix, not a choice to make.
    statements that can be checked, not intentions.
 2. **`Ready`.** The criteria are clear enough that work could start today.
 3. **Branch.** `feat/<issue>-<slug>`, `fix/…`, `docs/…`, `chore/<slug>`.
-   Never work on `main`.
+   Usually created by the assistant so it can commit; never work on `main`.
 4. **Work.** Cowork for product and architecture questions; Claude Code for
    work against existing code. Rule of thumb: if answering needs the
    codebase, it belongs in Claude Code.
@@ -37,8 +56,18 @@ defect to fix, not a choice to make.
    easiest as review suggestions; questions about the goal belong on the
    issue; open-ended "is this even right" belongs in a Cowork session.
 7. **Merge.** You merge. The assistant never merges its own pull request.
-8. **After.** Delete the branch, pull `main`, move the card to `Done`
-   (automatic if the "Item closed" workflow is enabled).
+8. **After.** Clean up and move the card to `Done` (automatic if the "Item
+   closed" workflow is enabled):
+
+   ```bash
+   git checkout main && git pull
+   git branch -d <branch>                  # local
+   git push origin --delete <branch>       # remote, if it still exists
+   git fetch --prune                       # drop stale tracking refs
+   ```
+
+   Enabling **Settings → General → "Automatically delete head branches"**
+   makes the remote half of this unnecessary from then on.
 
 ## Who can do what
 
