@@ -2,14 +2,14 @@
 
 - **Status:** accepted
 - **Date:** 2026-09-16
-- **Deciders:** Nico Schmidt
+- **Deciders:** Maintainer
 - **Supersedes:** —
 - **Superseded by:** —
 
 ## Context
 
 This repository is public. The first adventure will be derived from a
-commercially published adventure book that Nico owns, by scanning it. That
+commercially published adventure book the maintainer owns, by scanning it. That
 material is copyrighted: it may be used privately, but it must never be
 published, and it must therefore never enter this repository or any build
 artefact derived from it.

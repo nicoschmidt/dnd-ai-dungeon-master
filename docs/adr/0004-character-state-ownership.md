@@ -2,7 +2,7 @@
 
 - **Status:** proposed
 - **Date:** 2026-09-16
-- **Deciders:** Nico Schmidt
+- **Deciders:** Maintainer
 - **Supersedes:** —
 - **Superseded by:** —
 

@@ -2,7 +2,7 @@
 
 - **Status:** accepted
 - **Date:** 2026-09-16
-- **Deciders:** Nico Schmidt
+- **Deciders:** Maintainer
 - **Supersedes:** —
 - **Superseded by:** —
 
@@ -96,7 +96,7 @@ We build **a web application with a Python backend in which the dungeon
 master is an agent with explicit tools** — Options C and D combined. The
 Claude Agent SDK provides the agent loop; Python is the implementation
 language for the backend and the rules core, chosen because it is the
-language Nico knows best and because the rules core is ordinary,
+language the maintainer knows best and because the rules core is ordinary,
 test-friendly domain logic.
 
 Three commitments follow from this, and they are the substance of the
