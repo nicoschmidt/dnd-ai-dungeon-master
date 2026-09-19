@@ -15,6 +15,7 @@ Early. The foundational architecture decisions are still open; see
 - [Vision and scope](docs/vision.md)
 - [Architecture](docs/architecture.md)
 - [Decision records](docs/adr/README.md)
+- [Process](docs/process.md) — how work moves from issue to merge
 - [Working agreements for AI assistants](CLAUDE.md)
 
 ## Adventure content
