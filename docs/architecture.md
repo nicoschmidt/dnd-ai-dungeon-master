@@ -76,6 +76,17 @@ iterations as responsibility moves out of the model
 progress, what the players have learned. Narrative texture that need not
 survive stays in the model's context and is deliberately not modelled here.
 
+**Party state.** Of each character the system holds only what it computes
+*against* ([ADR-0004](adr/0004-character-state-ownership.md)): name, class and
+level for narration, armour class, maximum, current and temporary hit points,
+active conditions, and later position on the map. Everything else — ability
+scores and modifiers, skills, attacks, spells, limited resources, inventory —
+stays on the players' paper sheets, because the players roll and add
+themselves and the system never needs those values to adjudicate what they
+do. The line is drawn by how often the system needs a value and how quickly a
+player could answer it; moving it requires a new decision record. Characters
+are typed in once per campaign, and the status panel shows exact hit points.
+
 **AdventureRepository.** A port, not a path. The engine asks for a scene, an
 NPC or an asset by identity; the filesystem implementation resolves that
 against an adventure package directory whose location comes from
@@ -98,7 +109,7 @@ test fixtures must be original or SRD content.
 | Record architecture decisions | [ADR-0001](adr/0001-record-architecture-decisions.md) | accepted |
 | Application form factor | [ADR-0002](adr/0002-application-form-factor.md) | accepted |
 | Adventure content separation | [ADR-0003](adr/0003-adventure-content-separation.md) | accepted |
-| Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | proposed |
+| Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | accepted |
 | Concrete web stack | ADR-0005 | not yet written |
 
 ## Open
@@ -108,3 +119,9 @@ test fixtures must be original or SRD content.
   streaming narration — is deferred until iteration 1 is scoped.
 - The initial tool surface of the dungeon master agent is defined as part of
   iteration 1 planning.
+- Whether limited resources — spell slots, rage uses, hit dice — ever cross
+  into the state the system owns. They are outside it today
+  ([ADR-0004](adr/0004-character-state-ownership.md)).
+- Whether the shared screen carries a view outside the fiction, showing
+  monster hit points and the system's own rolls, so that a table with no human
+  game master can check the AI's arithmetic.
