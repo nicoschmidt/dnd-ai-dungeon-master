@@ -114,7 +114,7 @@ Manual does not mean unassisted. **Every manual step is handed over ready to
 run.** For each one, provide:
 
 - the exact text, where text is needed — issue body, pull request body —
-  written to a file beside the repository, never inside it
+  written to a file beside the repository, never inside it (see below)
 - the exact command as a copy-paste block, with real values already filled
   in: real issue numbers, real branch names, real paths, no placeholders the
   maintainer has to resolve
@@ -137,7 +137,9 @@ A handover script that writes to GitHub is exercised against a stand-in for
 `gh` before it is handed over, and fails loudly rather than reporting a
 success it did not achieve. This environment has no credentials, so a script
 it hands over has otherwise never run at all — and the maintainer discovering
-that by pasting it is not a review gate, it is a waste of their evening.
+that by pasting it is not a review gate, it is a waste of their evening. The
+harness is `scripts/test-gh-board.sh`; it runs after any change under
+`scripts/`.
 
 Status is the exception and stays the maintainer's click: moving a card to
 `Ready`, `In review` or `Done` is a judgement about whether the work is there
@@ -146,9 +148,24 @@ yet, and handing that over as a command would hand over the judgement with it.
 Where a step genuinely cannot be a command — a review, a merge, a repository
 setting — name the exact path through the interface instead.
 
-Drafted issue and pull request bodies live beside the repository rather than
-in it. Committed, they would be a parallel task list, which is forbidden
-above.
+The line between what is committed and what is not runs between **content and
+tooling**, not between one-off and reusable.
+
+Content is not committed. A drafted issue body, a pull request body, and the
+one-off `create-*.sh` that carries one, live beside the repository
+(`../pr-<n>-body.md`, `../create-*.sh`). Inside it they would be a second task
+list next to GitHub issues, which is forbidden above. Whether such a script
+runs once or a hundred times makes no difference: what it carries is the
+work item, and the work item belongs on GitHub.
+
+Tooling is committed, under `scripts/`. It carries no work items — it reads
+the board, sets a field, tests itself. Keeping it outside costs three things
+this project has already paid for once: the rules above and the code that
+keeps them drift apart instead of changing in one reviewed commit; a test
+that is not in the repository cannot be part of a pull request's evidence or
+run in CI; and a fresh session that reads `CLAUDE.md`, learns that board
+fields arrive set, and finds no script, writes a new one — with guessed field
+names.
 
 One exception, by necessity: the assistant creates the local branch itself,
 because it cannot commit without one. A local branch reaches nobody, so it is
