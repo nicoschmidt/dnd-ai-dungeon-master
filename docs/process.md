@@ -159,6 +159,9 @@ and that is a genuinely bad afternoon, which is why the rule exists.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
   `chore:`). The message carries the reasoning; discussion in a chat window
   does not survive.
+- **CI:** the `main` ruleset requires one check, `CI passed`. A new job in
+  `.github/workflows/ci.yml` joins that job's `needs` list instead of the
+  ruleset; `tests/test_ci_workflow.py` fails when it does not.
 - **Language:** repository in English, conversation in German.
 - **Adventure content** never enters this repository. See
   [ADR-0003](adr/0003-adventure-content-separation.md).

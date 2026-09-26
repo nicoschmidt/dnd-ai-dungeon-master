@@ -80,3 +80,21 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  # The one check the main ruleset requires. Every other job is listed in
+  # `needs`; tests/test_ci_workflow.py fails when one is missing, so adding a
+  # job never means touching the repository settings.
+  ci-passed:
+    name: CI passed
+    # Without always(), a failed job would skip this one, and a skipped
+    # required check counts as passed.
+    if: always()
+    needs: [scripts, backend, client]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: |
+          echo "Not every job succeeded: ${{ join(needs.*.result, ', ') }}"
+          exit 1
+      - run: echo "every job succeeded"

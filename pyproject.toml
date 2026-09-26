@@ -17,6 +17,7 @@ dependencies = [
 dev = [
     "httpx2",
     "pytest",
+    "pyyaml",
 ]
 
 [tool.setuptools.packages.find]
