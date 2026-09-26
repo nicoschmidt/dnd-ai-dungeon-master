@@ -72,8 +72,10 @@ belongs in Claude Code.
   not because the change is obviously correct. Everything reaches `main`
   through a branch and a pull request. There is no threshold below which
   this stops applying.
-- Branch naming: `feat/<issue>-<slug>`, `fix/<issue>-<slug>`,
-  `docs/<issue>-<slug>`, `chore/<slug>`.
+- Branch naming: `<type>/<issue>-<slug>` for every branch, where `<type>` is
+  `feat`, `fix`, `docs` or `chore` — for example
+  `chore/5-adventure-content-check`. Every branch has an issue, so every
+  branch carries its number.
 - One pull request per issue, opened on GitHub. A branch merged locally is
   not a review; the pull request is where the definition of done is checked
   off. The PR body references the issue and fills in the template rather

@@ -65,7 +65,8 @@ push is the gate, not the branch.
 2. **`Ready`.** The criteria are clear enough that work could start today.
    → *The maintainer's click on the board.* Nothing to paste, and deliberately
    so: status is the one board field that is a judgement rather than a fact.
-3. **Branch.** `feat/<issue>-<slug>`, `fix/…`, `docs/…`, `chore/<slug>`.
+3. **Branch.** `<type>/<issue>-<slug>` with `feat`, `fix`, `docs` or `chore`,
+   for example `chore/5-adventure-content-check`.
    Usually created by the assistant so it can commit; never work on `main`.
    → *Nothing to do.* The branch name is reported; it stays local until step 5.
 4. **Work.** Cowork for product and architecture questions; Claude Code for
