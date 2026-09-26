@@ -24,6 +24,32 @@ bash scripts/set-issue-fields.sh 13 S Backlog
 gh auth refresh -s project
 ```
 
+## Repository guards
+
+Not every script here reaches GitHub. These guard the repository itself and
+run in CI on every pull request:
+
+| Script | What it does |
+| --- | --- |
+| `check-no-adventure-content.sh` | Fails on adventure content paths, binaries, images and documents, and fixture directories without provenance. Read-only. |
+| `adventure-content-allowlist.txt` | The binary, image and document files that may be committed anyway. One path per line, each with a `# justification`. |
+| `test-check-no-adventure-content.sh` | Exercises the check against throwaway repositories. |
+
+```bash
+bash scripts/check-no-adventure-content.sh
+```
+
+The check is a heuristic, not a proof. It cannot tell whether a paragraph was
+copied out of a book ([ADR-0003](../docs/adr/0003-adventure-content-separation.md)).
+What it catches is a scan, an image or an unexplained fixture slipping in by
+accident.
+
+**Test fixtures** live in a directory named `fixtures`, for example
+`tests/fixtures/`. Every such directory carries a `PROVENANCE.md` that states
+where its content comes from. That is either original content written for
+this project, or SRD 5.1/5.2 material, named with its CC-BY-4.0 attribution.
+One `PROVENANCE.md` covers everything below its `fixtures` directory.
+
 ## What they assume
 
 Nothing is hardcoded about who owns this project. The repository is read from

@@ -81,6 +81,15 @@ jobs:
       - name: Build
         run: npm run build
 
+  adventure-content:
+    name: Adventure content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: No adventure content, binaries or fixtures without provenance
+        run: bash scripts/check-no-adventure-content.sh
+
   # The one check the main ruleset requires. Every other job is listed in
   # `needs`; tests/test_ci_workflow.py fails when one is missing, so adding a
   # job never means touching the repository settings.
@@ -89,7 +98,7 @@ jobs:
     # Without always(), a failed job would skip this one, and a skipped
     # required check counts as passed.
     if: always()
-    needs: [scripts, backend, client]
+    needs: [scripts, backend, client, adventure-content]
     runs-on: ubuntu-latest
     steps:
       - name: Every job succeeded

@@ -1,0 +1,7 @@
+# Binary, image and document files that may be committed despite
+# scripts/check-no-adventure-content.sh. One path per line, relative to the
+# repository root, each with a justification after '#':
+#
+#   client/public/icon.png  # generated app icon, original work
+#
+# Keep it short. Every entry is a file a reviewer has to trust.
