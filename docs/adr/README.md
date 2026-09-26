@@ -21,3 +21,4 @@ options considered, the choice made, and the consequences accepted with it.
 | [0003](0003-adventure-content-separation.md) | Adventure content separation | accepted |
 | [0004](0004-character-state-ownership.md) | Character state ownership | accepted |
 | [0005](0005-concrete-web-stack.md) | Concrete web stack | accepted |
+| [0006](0006-game-master-view-and-session-journal.md) | A separate game master view, fed by a session journal | accepted |
