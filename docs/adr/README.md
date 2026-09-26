@@ -22,3 +22,4 @@ options considered, the choice made, and the consequences accepted with it.
 | [0004](0004-character-state-ownership.md) | Character state ownership | accepted |
 | [0005](0005-concrete-web-stack.md) | Concrete web stack | accepted |
 | [0006](0006-game-master-view-and-session-journal.md) | A separate game master view, fed by a session journal | accepted |
+| [0007](0007-model-credentials.md) | The agent runs on the maintainer's subscription or on an API key, switchable | accepted |

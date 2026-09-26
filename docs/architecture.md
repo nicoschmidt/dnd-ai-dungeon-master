@@ -80,7 +80,11 @@ See [ADR-0005](adr/0005-concrete-web-stack.md).
 
 **Session orchestration.** Runs the dungeon master agent via the Claude Agent
 SDK: builds its context, streams narration to the client, and exposes the
-tool surface. This is the only component that depends on the Agent SDK. The
+tool surface. It runs the agent either on the maintainer's own Claude
+subscription or on an API key, chosen by configuration and switchable between
+turns; it builds the CLI's credential environment explicitly, verifies the
+credential source the SDK reports, and never handles a subscription credential
+itself ([ADR-0007](adr/0007-model-credentials.md)). This is the only component that depends on the Agent SDK. The
 HTTP surface around it is FastAPI, confined to a thin API layer: neither the
 rules core nor session state imports a web framework or the SDK, and CI fails a
 build that breaks that boundary ([ADR-0005](adr/0005-concrete-web-stack.md)).
@@ -155,6 +159,7 @@ test fixtures must be original or SRD content.
 | Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | accepted |
 | Concrete web stack | [ADR-0005](adr/0005-concrete-web-stack.md) | accepted |
 | Game master view and session journal | [ADR-0006](adr/0006-game-master-view-and-session-journal.md) | accepted |
+| Model credentials: subscription or API key | [ADR-0007](adr/0007-model-credentials.md) | accepted |
 
 ## Open
 
