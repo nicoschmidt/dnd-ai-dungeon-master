@@ -12,13 +12,17 @@ The players sit at one table and share one client view. Adventure content is
 private, lives in its own repository, and is loaded at runtime through a
 port rather than a path ([ADR-0003](adr/0003-adventure-content-separation.md)).
 At the table the whole thing is one process: `uvicorn` serves the API and the
-built client together ([ADR-0005](adr/0005-concrete-web-stack.md)).
+built client together ([ADR-0005](adr/0005-concrete-web-stack.md)). Everything
+outside the fiction is kept in a session journal and shown in a separate game
+master view, never on the table's screen
+([ADR-0006](adr/0006-game-master-view-and-session-journal.md)).
 
 ```mermaid
 flowchart TD
     subgraph table["At the table"]
         players["Players<br/>pen, paper, physical dice"]
         client["Web client<br/>narration log · input · party status<br/>(later: map grid)"]
+        gmview["Game master view (/gm)<br/>opponent · rolls · tool calls · plan"]
     end
 
     subgraph backend["Backend (Python)"]
@@ -27,6 +31,7 @@ flowchart TD
         rules["Rules core<br/>pure, deterministic, no model calls"]
         state["Session state<br/>party · adventure progress · what is known"]
         repo["AdventureRepository (port)<br/>+ asset endpoint with reveal check"]
+        journal[("Session journal<br/>JSONL, outside the repo")]
     end
 
     model["Claude model API"]
@@ -42,6 +47,9 @@ flowchart TD
 
     players <--> client
     orch -->|"narration + state (SSE)"| client
+    journal -->|"hidden events (own SSE stream)"| gmview
+    tools --> journal
+    orch --> journal
     client -->|"declared actions (POST)"| orch
     client -->|"asset requests"| repo
     orch <--> model
@@ -76,6 +84,24 @@ tool surface. This is the only component that depends on the Agent SDK. The
 HTTP surface around it is FastAPI, confined to a thin API layer: neither the
 rules core nor session state imports a web framework or the SDK, and CI fails a
 build that breaks that boundary ([ADR-0005](adr/0005-concrete-web-stack.md)).
+
+**Session journal.** An append-only JSON Lines file per session, at a configured
+path outside the repository: every tool call with its arguments and result,
+every roll the code makes with its dice, every state event, every update of the
+agent's plan, and per model turn the usage, cost and credential mode. The tool
+layer and orchestration write it; it contains adventure text and is kept like
+the adventure package. It is a record, not persistence
+([ADR-0006](adr/0006-game-master-view-and-session-journal.md)).
+
+**Game master view.** A separate route, `/gm`, in the same client, fed by its
+own SSE stream and rendered from the journal: opponent state, roll records, tool
+calls, the agent's plan, cost per turn, and from iteration 002 undiscovered
+adventure information. The table's stream carries a closed list of event types,
+enforced by a test, so nothing hidden reaches the shared screen by a rendering
+mistake. The agent's plan is written through a tool, never extracted from its
+reasoning. The SDK's OpenTelemetry export is an optional second layer, pointed
+at a local collector only
+([ADR-0006](adr/0006-game-master-view-and-session-journal.md)).
 
 **Tool layer.** The contract between the agent and everything durable. The
 agent narrates and decides; it does not mutate state by describing a
@@ -128,6 +154,7 @@ test fixtures must be original or SRD content.
 | Adventure content separation | [ADR-0003](adr/0003-adventure-content-separation.md) | accepted |
 | Character state ownership | [ADR-0004](adr/0004-character-state-ownership.md) | accepted |
 | Concrete web stack | [ADR-0005](adr/0005-concrete-web-stack.md) | accepted |
+| Game master view and session journal | [ADR-0006](adr/0006-game-master-view-and-session-journal.md) | accepted |
 
 ## Open
 
@@ -142,6 +169,5 @@ test fixtures must be original or SRD content.
 - Whether limited resources — spell slots, rage uses, hit dice — ever cross
   into the state the system owns. They are outside it today
   ([ADR-0004](adr/0004-character-state-ownership.md)).
-- Whether the shared screen carries a view outside the fiction, showing
-  monster hit points and the system's own rolls, so that a table with no human
-  game master can check the AI's arithmetic.
+- Whether a session is restored by replaying its journal
+  ([ADR-0006](adr/0006-game-master-view-and-session-journal.md)).
