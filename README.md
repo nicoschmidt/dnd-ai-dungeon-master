@@ -67,6 +67,10 @@ per component of the [architecture](docs/architecture.md):
 | `dungeon_master.rules` | Rules core | neither a web framework nor the SDK |
 | `dungeon_master.session` | Session state | neither a web framework nor the SDK |
 
+The last two rows are enforced, not merely intended:
+`tests/test_layer_boundary.py` fails on any such import, and CI runs it on
+every pull request.
+
 The client lives in `client/` (Vite, React, TypeScript), the tests for the
 backend in `tests/`.
 
