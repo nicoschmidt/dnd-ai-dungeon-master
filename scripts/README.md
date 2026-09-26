@@ -56,3 +56,8 @@ Run `bash scripts/test-gh-board.sh`. A script that writes to GitHub is
 exercised against a stand-in before it is handed over — see `CLAUDE.md`. Two
 broken versions of `gh-board.sh` reached the maintainer before that harness
 existed, and both would have failed on their first dry run.
+
+CI does the same on every pull request (the `Scripts` job in
+`.github/workflows/ci.yml`): `bash -n` over every `scripts/*.sh`, then every
+`scripts/test-*.sh`. A new harness named `test-*.sh` is picked up without
+touching the workflow. Running it locally first is still the faster loop.
