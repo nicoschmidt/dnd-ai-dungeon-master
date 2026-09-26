@@ -89,7 +89,10 @@ backend in `tests/`.
 This repository contains no adventure material and never will. Adventure
 content is copyrighted, is kept outside this repository, and is loaded by
 the application at runtime. See
-[ADR-0003](docs/adr/0003-adventure-content-separation.md).
+[ADR-0003](docs/adr/0003-adventure-content-separation.md). CI fails a pull
+request that adds adventure content paths, binaries or images, or test
+fixtures without a stated provenance; see
+[`scripts/README.md`](scripts/README.md#repository-guards).
 
 ## Licence
 
