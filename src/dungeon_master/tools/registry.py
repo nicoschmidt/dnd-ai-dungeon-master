@@ -31,7 +31,8 @@ TOOLS: tuple[ToolSpec, ...] = (
     ),
     ToolSpec(
         "record_initiative",
-        "Record a character's initiative total, as the player reported it. One call per character.",
+        "Record a character's initiative total and Dexterity modifier, as the player reported them. "
+        "One call per character.",
         schemas.RecordInitiative,
         handlers.record_initiative,
     ),

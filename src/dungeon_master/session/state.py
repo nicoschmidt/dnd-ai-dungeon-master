@@ -9,15 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ..rules.encounter import Outcome
 from .party import Character
-
-Outcome = Literal[
-    "opponent_defeated",
-    "opponent_fled",
-    "party_fled",
-    "party_defeated",
-    "parley",
-]
 
 
 class Combatant(BaseModel):
