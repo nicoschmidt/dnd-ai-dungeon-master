@@ -9,3 +9,21 @@ body {
   max-width: 48rem;
   padding: 2rem 1rem;
 }
+
+.connection {
+  opacity: 0.7;
+}
+
+.narration .declared {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+form input {
+  flex: 1;
+}

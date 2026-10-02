@@ -41,7 +41,12 @@ since; that client is also sent the whole of the new session.
 
 The whole session is held in memory. For one evening that is small; bounding it
 is a refinement for when it is not. While no event is due, the stream sends an
-SSE comment line every few seconds to keep the connection alive.
+SSE comment line every 15 seconds to keep the connection alive.
+
+The client keeps its state in `client/src/stream/`: a reducer that builds the
+table's state from events alone, and a hook that listens for every event type
+by name. It notices a backend restart by the changed session id in the event
+ids, and rebuilds its state instead of appending to it.
 
 ## Events
 
