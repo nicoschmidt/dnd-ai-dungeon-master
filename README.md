@@ -28,23 +28,43 @@ python3 -m venv .venv
 **At the table**, one process serves everything:
 
 ```bash
-.venv/bin/uvicorn dungeon_master.api.app:app
+.venv/bin/uvicorn dungeon_master.api.app:app --timeout-graceful-shutdown 1
 ```
 
 Then open <http://127.0.0.1:8000>. The backend serves the client from
 `client/dist`; set `DM_CLIENT_DIST` to serve a build from elsewhere. Without a
 build it serves the API only and says so in its log.
 
+The timeout matters: the table's event stream stays open as long as a browser
+shows the page, and without it uvicorn waits for that browser before it stops.
+
 **While developing**, run the backend and the Vite dev server side by side,
 and open <http://localhost:5173>. Vite proxies `/api` to the backend.
 
 ```bash
-.venv/bin/uvicorn dungeon_master.api.app:app --reload
+.venv/bin/uvicorn dungeon_master.api.app:app --reload --timeout-graceful-shutdown 1
 ```
 
 ```bash
 cd client && npm run dev
 ```
+
+**Watching the stream.** `curl -N` shows exactly the events the page receives
+(see [the event contract](docs/event-contract.md)). In one shell:
+
+```bash
+curl -N http://127.0.0.1:8000/api/session/stream
+```
+
+and in another, declare an action:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/session/actions \
+  -H 'content-type: application/json' -d '{"text": "I attack the ogre, 17"}'
+```
+
+Until the dungeon master runs on a model (#32), a stand-in answers every
+action by echoing it, word by word.
 
 **Tests:**
 

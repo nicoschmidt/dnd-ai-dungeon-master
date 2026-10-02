@@ -16,6 +16,33 @@ TypeScript is.
 The contract is versioned (`CONTRACT_VERSION`, currently 1) and changed
 deliberately, like the adventure schema.
 
+## Endpoints
+
+| Route | Does |
+| --- | --- |
+| `GET /api/session/stream` | The table's event stream, `text/event-stream`. Opened once by the page and kept open. |
+| `POST /api/session/actions` | Declare an action. Body: a `DeclaredAction`. Answers `202` with the `turn_id`; everything the turn produces arrives on the stream. `409` while a turn is still running — interrupting the dungeon master is deliberately not possible (ADR-0005). `422` for a body that does not fit. |
+
+One table, one session, in one process. The session lives as long as the
+backend does.
+
+### Event ids and reconnecting
+
+Every event has an id of the form `<session id>:<sequence number>`, starting at
+1. The browser's `EventSource` remembers the last id it received, reconnects on
+its own after a dropped connection, and sends that id as `Last-Event-ID`. The
+stream then begins with the first event after it, so nothing is missed and
+nothing arrives twice.
+
+Without `Last-Event-ID` — a fresh page, a reload, `curl -N` — the stream begins
+with the first event of the session, so a reloaded page rebuilds its narration
+log and party state. An id from another session means the backend has restarted
+since; that client is also sent the whole of the new session.
+
+The whole session is held in memory. For one evening that is small; bounding it
+is a refinement for when it is not. While no event is due, the stream sends an
+SSE comment line every few seconds to keep the connection alive.
+
 ## Events
 
 Every event names its type twice: as the SSE `event:` field, so the client

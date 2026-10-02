@@ -7,11 +7,18 @@ and proxies `/api` here, so a missing client build is not an error.
 
 import logging
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from ..orchestration.agent import DungeonMaster
+from ..orchestration.session import TableSession
+from ..orchestration.stand_in import StandInDungeonMaster
+from . import session
 
 logger = logging.getLogger(__name__)
 
@@ -30,18 +37,33 @@ def health() -> Health:
     return Health(status="ok")
 
 
-def create_app(client_dist: Path | None = None) -> FastAPI:
-    """Build the application.
+def create_app(
+    client_dist: Path | None = None, dungeon_master: DungeonMaster | None = None
+) -> FastAPI:
+    """Build the application, with one session for the one table.
 
     `client_dist` is the directory of the built client. It defaults to
     `DM_CLIENT_DIST` from the environment, else `client/dist` relative to the
-    working directory.
+    working directory. `dungeon_master` defaults to the stand-in until the
+    agent runs on a model (#32).
     """
     if client_dist is None:
         client_dist = Path(os.environ.get("DM_CLIENT_DIST", DEFAULT_CLIENT_DIST))
 
-    app = FastAPI(title="AI Dungeon Master")
+    table = TableSession(dungeon_master or StandInDungeonMaster())
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        yield
+        # uvicorn runs this only after every connection has closed, and a
+        # browser never closes the table's stream: run it with
+        # `--timeout-graceful-shutdown`, as the README does, or it waits forever.
+        await table.close()
+
+    app = FastAPI(title="AI Dungeon Master", lifespan=lifespan)
+    app.state.session = table
     app.include_router(router)
+    app.include_router(session.router)
 
     # Mounted last: a mount at "/" would otherwise shadow the API routes.
     if client_dist.is_dir():
