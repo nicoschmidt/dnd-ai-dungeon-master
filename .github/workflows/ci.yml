@@ -75,6 +75,16 @@ jobs:
       - name: Install
         run: npm ci
 
+      # The backend's tests check the schema against the Pydantic models; this
+      # checks the TypeScript against the schema.
+      - name: Contract types are current
+        run: |
+          npm run contract
+          git diff --exit-code -- src/contract || {
+            echo "::error::client/src/contract is stale. Run \`npm run contract\` in client/ and commit the result."
+            exit 1
+          }
+
       - name: Lint
         run: npm run lint
 

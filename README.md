@@ -8,9 +8,11 @@ the players what they do, and adjudicating the results they roll.
 ## Status
 
 Early. Iteration 001 — one combat encounter — is under way; see
-[`docs/iterations/`](docs/iterations/README.md). What exists so far is the
-skeleton: a backend that serves an API and the built client from one process,
-and a client that shows whether it reaches the backend.
+[`docs/iterations/`](docs/iterations/README.md). What exists so far: one
+process that serves the API and the built client; the table's event stream,
+with narration arriving word by word; an input for the declared action; and
+the dungeon master's tools, of which only the conditions work yet. Until the
+agent runs on a model, a stand-in answers.
 
 ## Running it
 
@@ -71,6 +73,14 @@ action by echoing it, word by word.
 ```bash
 .venv/bin/pytest
 (cd client && npm run lint && npm run build)
+```
+
+**After changing the event contract** in `src/dungeon_master/events/`,
+regenerate the schema and the client's types, and commit both:
+
+```bash
+.venv/bin/python -m dungeon_master.events.schema
+(cd client && npm run contract)
 ```
 
 ## Code layout

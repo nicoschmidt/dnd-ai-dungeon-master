@@ -28,46 +28,38 @@
         "id": {
           "description": "Stable identity within the session; tools address the character by it.",
           "pattern": "^[a-z0-9][a-z0-9-]*$",
-          "title": "Id",
           "type": "string"
         },
         "name": {
           "minLength": 1,
-          "title": "Name",
           "type": "string"
         },
         "character_class": {
           "description": "For narration only.",
           "minLength": 1,
-          "title": "Character Class",
           "type": "string"
         },
         "level": {
           "description": "For narration only.",
           "maximum": 20,
           "minimum": 1,
-          "title": "Level",
           "type": "integer"
         },
         "armour_class": {
           "minimum": 0,
-          "title": "Armour Class",
           "type": "integer"
         },
         "max_hit_points": {
           "minimum": 1,
-          "title": "Max Hit Points",
           "type": "integer"
         },
         "current_hit_points": {
           "minimum": 0,
-          "title": "Current Hit Points",
           "type": "integer"
         },
         "temporary_hit_points": {
           "default": 0,
           "minimum": 0,
-          "title": "Temporary Hit Points",
           "type": "integer"
         },
         "conditions": {
@@ -93,7 +85,6 @@
             ],
             "type": "string"
           },
-          "title": "Conditions",
           "type": "array"
         }
       },
@@ -120,15 +111,12 @@
             "character",
             "opponent"
           ],
-          "title": "Kind",
           "type": "string"
         },
         "id": {
-          "title": "Id",
           "type": "string"
         },
         "name": {
-          "title": "Name",
           "type": "string"
         }
       },
@@ -147,7 +135,6 @@
         "text": {
           "maxLength": 2000,
           "minLength": 1,
-          "title": "Text",
           "type": "string"
         },
         "character_id": {
@@ -160,8 +147,7 @@
             }
           ],
           "default": null,
-          "description": "The acting character, when the client knows it.",
-          "title": "Character Id"
+          "description": "The acting character, when the client knows it."
         }
       },
       "required": [
@@ -176,21 +162,18 @@
       "description": "What the table may know about the encounter (docs/domain/combat.md).\n\nThe opponent's numbers are not here: they are hidden from the table and\nbelong to the opponent's own state (#31).",
       "properties": {
         "opponent_name": {
-          "title": "Opponent Name",
           "type": "string"
         },
         "round": {
           "default": 0,
           "description": "0 until the turn order is fixed.",
           "minimum": 0,
-          "title": "Round",
           "type": "integer"
         },
         "turn_order": {
           "items": {
             "$ref": "#/$defs/Combatant"
           },
-          "title": "Turn Order",
           "type": "array"
         },
         "current_turn": {
@@ -204,8 +187,7 @@
             }
           ],
           "default": null,
-          "description": "Index into turn_order of whoever acts now.",
-          "title": "Current Turn"
+          "description": "Index into turn_order of whoever acts now."
         },
         "outcome": {
           "anyOf": [
@@ -224,8 +206,7 @@
             }
           ],
           "default": null,
-          "description": "Set when the encounter has ended.",
-          "title": "Outcome"
+          "description": "Set when the encounter has ended."
         }
       },
       "required": [
@@ -245,7 +226,6 @@
         "type": {
           "const": "encounter_updated",
           "default": "encounter_updated",
-          "title": "Type",
           "type": "string"
         },
         "encounter": {
@@ -273,15 +253,12 @@
         "type": {
           "const": "narration_delta",
           "default": "narration_delta",
-          "title": "Type",
           "type": "string"
         },
         "turn_id": {
-          "title": "Turn Id",
           "type": "string"
         },
         "text": {
-          "title": "Text",
           "type": "string"
         }
       },
@@ -300,14 +277,12 @@
         "type": {
           "const": "party_updated",
           "default": "party_updated",
-          "title": "Type",
           "type": "string"
         },
         "party": {
           "items": {
             "$ref": "#/$defs/Character"
           },
-          "title": "Party",
           "type": "array"
         }
       },
@@ -325,16 +300,13 @@
         "type": {
           "const": "error",
           "default": "error",
-          "title": "Type",
           "type": "string"
         },
         "code": {
           "const": "agent_failed",
-          "title": "Code",
           "type": "string"
         },
         "message": {
-          "title": "Message",
           "type": "string"
         },
         "turn_id": {
@@ -346,8 +318,7 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "title": "Turn Id"
+          "default": null
         }
       },
       "required": [
@@ -400,11 +371,9 @@
         "type": {
           "const": "turn_finished",
           "default": "turn_finished",
-          "title": "Type",
           "type": "string"
         },
         "turn_id": {
-          "title": "Turn Id",
           "type": "string"
         }
       },
@@ -422,11 +391,9 @@
         "type": {
           "const": "turn_started",
           "default": "turn_started",
-          "title": "Type",
           "type": "string"
         },
         "turn_id": {
-          "title": "Turn Id",
           "type": "string"
         },
         "action": {

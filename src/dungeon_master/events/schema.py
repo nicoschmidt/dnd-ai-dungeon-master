@@ -35,6 +35,11 @@ def contract_schema() -> dict:
         ref_template="#/$defs/{model}",
     )
     defs = schema["$defs"]
+    for definition in defs.values():
+        # A field's title would become a TypeScript alias of its own (`Type1`,
+        # `TurnId3`); without it the field's type is written inline.
+        for field in definition.get("properties", {}).values():
+            field.pop("title", None)
     defs["TableEvent"] = {"title": "TableEvent", **refs[("event", "serialization")]}
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
