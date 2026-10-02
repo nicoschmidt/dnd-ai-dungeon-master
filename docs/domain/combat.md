@@ -228,7 +228,8 @@ hidden from the table. The game master view shows all of it.
 
 ## The tools this implies
 
-Named here for their meaning; the schemas are the event contract's (#23).
+Named here for their meaning; the schemas are
+[the event contract's](../event-contract.md#the-dungeon-masters-tools).
 Every tool that changes state produces an event; which stream carries it
 follows the table above.
 

@@ -72,11 +72,12 @@ the backend changing.
 
 **Transport.** Server-Sent Events carry everything the table sees: narration
 arrives as `narration_delta`, durable state as `party_updated` and its
-siblings. The status panel renders from the state events and from nothing else,
-so a number on the panel always came through a tool. A declared action and the
-dice the player rolled go back as an ordinary `POST`. Event ids and the
-browser's own `Last-Event-ID` carry a session across a dropped connection.
-See [ADR-0005](adr/0005-concrete-web-stack.md).
+siblings, as declared in [the event contract](event-contract.md). The status
+panel renders from the state events and from nothing else, so a number on the
+panel always came through a tool. A declared action and the dice the player
+rolled go back as an ordinary `POST`. Event ids and the browser's own
+`Last-Event-ID` carry a session across a dropped connection. See
+[ADR-0005](adr/0005-concrete-web-stack.md).
 
 **Session orchestration.** Runs the dungeon master agent via the Claude Agent
 SDK: builds its context, streams narration to the client, and exposes the
@@ -109,9 +110,11 @@ at a local collector only
 
 **Tool layer.** The contract between the agent and everything durable. The
 agent narrates and decides; it does not mutate state by describing a
-mutation. Tool contracts are designed from the domain, so a tool can start
-out backed by model judgement and later be backed by deterministic code
-without anything above it changing.
+mutation. The tools of iteration 001 are listed in
+[the event contract](event-contract.md#the-dungeon-masters-tools). Tool
+contracts are designed from the domain, so a tool can start out backed by model
+judgement and later be backed by deterministic code without anything above it
+changing.
 
 **Rules core.** Ordinary Python domain logic — dice arithmetic, attack
 resolution, conditions, state transitions. It imports neither the Agent SDK
@@ -164,10 +167,6 @@ test fixtures must be original or SRD content.
 ## Open
 
 - The v1 adventure schema is iteration work, not yet defined.
-- The initial tool surface of the dungeon master agent is defined as part of
-  iteration 1 planning. It is the same piece of work as the event contract,
-  because every tool that changes durable state produces an event
-  ([ADR-0005](adr/0005-concrete-web-stack.md)).
 - How a player interrupts a turn while narration is still being generated. The
   transport cannot carry it today, deliberately
   ([ADR-0005](adr/0005-concrete-web-stack.md)).

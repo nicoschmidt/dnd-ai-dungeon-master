@@ -59,3 +59,40 @@ the turn; the action can be declared again. #32 adds the credential errors.
 `DeclaredAction` is what a player sends: `text`, the declared action with the
 dice they rolled in their own words, and `character_id`, the acting character
 when the client knows it (from #30 on), else `null`.
+
+## The dungeon master's tools
+
+The tools the agent may call in iteration 001. Their meaning is
+[docs/domain/combat.md](domain/combat.md)'s; their argument schemas are the
+Pydantic models in `src/dungeon_master/tools/schemas.py`, and the list itself
+is `src/dungeon_master/tools/registry.py`. Every schema forbids arguments it
+does not name.
+
+| Tool | Arguments | Implemented |
+| --- | --- | --- |
+| `start_encounter` | `opponent_id` | refuses until #29 and #31 |
+| `record_initiative` | `character_id`, `total` | refuses until #29 |
+| `resolve_player_attack` | `character_id`, `total`, `natural_roll` (1 or 20, optional) | refuses until #29 and #31 |
+| `opponent_saving_throw` | `ability`, `dc`, `mode` | refuses until #29 and #31 |
+| `opponent_attack` | `attack`, `target_id`, `mode` | refuses until #29 and #31 |
+| `apply_damage` | `target`, `amount`, `damage_type`, `halved_on_save`, `critical` | refuses until #29 |
+| `heal` | `character_id`, `amount` | refuses until #29 |
+| `set_temporary_hit_points` | `character_id`, `amount` | refuses until #29 |
+| `add_condition`, `remove_condition` | `target`, `condition` | for characters; the opponent refuses until #31 |
+| `end_turn` | — | refuses until #29 |
+| `end_encounter` | `outcome` | refuses until #29 |
+| `update_plan` | `plan` | refuses until #34 |
+
+`target` is a character's id or `opponent`. `mode` is `normal`, `advantage` or
+`disadvantage`. `damage_type`, `ability`, `condition` and `outcome` take the
+SRD's names, in lower case.
+
+**Every call goes through the `ToolBox`.** It refuses an unknown tool or
+arguments that do not fit the schema before any handler runs, and it compares
+the party and the encounter before and after the handler. When either differs,
+it publishes `party_updated` or `encounter_updated` with the new state. No
+tool declares what it changes, so none can forget to say so.
+
+**A refusal is a result, not an error.** It carries a reason the model reads,
+so the dungeon master can correct itself rather than narrate something the
+state does not support.
