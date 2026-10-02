@@ -1,0 +1,37 @@
+{
+  "id": "ogre",
+  "name": "Ogre",
+  "armour_class": 11,
+  "hit_points": 68,
+  "dexterity_modifier": -1,
+  "saving_throws": {
+    "strength": 4,
+    "dexterity": -1,
+    "constitution": 3,
+    "intelligence": -3,
+    "wisdom": -2,
+    "charisma": -2
+  },
+  "attacks": [
+    {
+      "name": "Greatclub",
+      "attack_bonus": 6,
+      "damage_dice": 2,
+      "damage_die": 8,
+      "damage_modifier": 4,
+      "damage_type": "bludgeoning"
+    },
+    {
+      "name": "Javelin",
+      "attack_bonus": 6,
+      "damage_dice": 2,
+      "damage_die": 6,
+      "damage_modifier": 4,
+      "damage_type": "piercing"
+    }
+  ],
+  "attacks_per_turn": 1,
+  "resistances": [],
+  "vulnerabilities": [],
+  "immunities": []
+}

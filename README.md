@@ -12,10 +12,10 @@ Early. Iteration 001 — one combat encounter — is under way; see
 process that serves the API and the built client; the table's event stream,
 with narration arriving word by word; a form to enter the party and a status
 panel that shows it; an input for the declared action, with the acting
-character preselected; the rules of combat in deterministic code; and the
-dungeon master's tools, of which damage, healing, temporary hit points and
-conditions on characters work so far.
-Until the agent runs on a model, a stand-in answers.
+character preselected; the rules of combat in deterministic code; an opponent,
+the SRD's Ogre, through the adventure port; and the dungeon master's tools, of
+which damage, healing, temporary hit points and conditions on characters work
+so far. Until the agent runs on a model, a stand-in answers.
 
 ## Running it
 
@@ -100,8 +100,9 @@ per component of the [architecture](docs/architecture.md):
 | `dungeon_master.events` | The table's event contract | session state — neither a web framework nor the SDK |
 | `dungeon_master.rules` | Rules core | neither a web framework nor the SDK |
 | `dungeon_master.session` | Session state | neither a web framework nor the SDK |
+| `dungeon_master.adventure` | AdventureRepository port, content models | rules core — neither a web framework nor the SDK |
 
-The last four rows are enforced, not merely intended:
+The last five rows are enforced, not merely intended:
 `tests/test_layer_boundary.py` fails on any such import, and CI runs it on
 every pull request.
 

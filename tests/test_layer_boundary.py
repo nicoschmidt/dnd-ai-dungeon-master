@@ -1,11 +1,11 @@
 """ADR-0005, commitment 4: no web framework or Agent SDK below the API layer.
 
-The rules core, session state, the table's event contract and the tool layer
-must import neither a web framework nor the Claude Agent SDK. Nor may they
-import the API or orchestration packages, which would bring either in by the
-back door. The check reads the source with `ast` rather than importing it, so
-it names the file and line of every offending import and is not fooled by a
-module that merely mentions one.
+The rules core, session state, the table's event contract, the tool layer and
+the adventure port must import neither a web framework nor the Claude Agent
+SDK. Nor may they import the API or orchestration packages, which would bring
+either in by the back door. The check reads the source with `ast` rather than
+importing it, so it names the file and line of every offending import and is
+not fooled by a module that merely mentions one.
 """
 
 import ast
@@ -20,6 +20,7 @@ GUARDED_PACKAGES = (
     "dungeon_master.session",
     "dungeon_master.events",
     "dungeon_master.tools",
+    "dungeon_master.adventure",
 )
 
 FORBIDDEN = (
