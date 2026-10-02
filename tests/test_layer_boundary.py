@@ -1,10 +1,11 @@
 """ADR-0005, commitment 4: no web framework or Agent SDK below the API layer.
 
-The rules core and session state must import neither a web framework nor the
-Claude Agent SDK. Nor may they import the API or orchestration packages,
-which would bring either in by the back door. The check reads the source with
-`ast` rather than importing it, so it names the file and line of every
-offending import and is not fooled by a module that merely mentions one.
+The rules core, session state, the table's event contract and the tool layer
+must import neither a web framework nor the Claude Agent SDK. Nor may they
+import the API or orchestration packages, which would bring either in by the
+back door. The check reads the source with `ast` rather than importing it, so
+it names the file and line of every offending import and is not fooled by a
+module that merely mentions one.
 """
 
 import ast
@@ -14,7 +15,12 @@ import pytest
 
 SRC = Path(__file__).resolve().parent.parent / "src"
 
-GUARDED_PACKAGES = ("dungeon_master.rules", "dungeon_master.session")
+GUARDED_PACKAGES = (
+    "dungeon_master.rules",
+    "dungeon_master.session",
+    "dungeon_master.events",
+    "dungeon_master.tools",
+)
 
 FORBIDDEN = (
     "fastapi",
@@ -73,12 +79,12 @@ def forbidden_imports(src: Path, packages=GUARDED_PACKAGES) -> list[str]:
     return offences
 
 
-def test_rules_and_session_import_no_framework_or_sdk() -> None:
+def test_layers_below_the_api_import_no_framework_or_sdk() -> None:
     offences = forbidden_imports(SRC)
 
     assert not offences, (
-        "The rules core and session state must not import a web framework or "
-        "the Agent SDK (ADR-0005, commitment 4):\n  " + "\n  ".join(offences)
+        "The rules core, session state, events and tools must not import a web "
+        "framework or the Agent SDK (ADR-0005, commitment 4):\n  " + "\n  ".join(offences)
     )
 
 
