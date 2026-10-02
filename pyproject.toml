@@ -25,5 +25,9 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+# Iteration 001's built-in fight: SRD and original content, see its PROVENANCE.md.
+"dungeon_master.adventure" = ["fixtures/*.md", "fixtures/*/*/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -142,6 +142,10 @@ NPC or an asset by identity; the filesystem implementation resolves that
 against an adventure package directory whose location comes from
 configuration. Tests use an in-memory implementation with original or SRD
 content, so the engine is fully testable with no private content present.
+Iteration 001 has the port with what a fight needs — `monster()` and
+`encounter_setup()` — and the in-memory implementation, which also carries the
+built-in fight against an SRD opponent; the manifest, scenes, NPCs, assets and
+the filesystem implementation arrive with the adventure schema.
 
 Assets never reach the client as static files. They are served by an
 endpoint that checks the current reveal state first, so a map the party has

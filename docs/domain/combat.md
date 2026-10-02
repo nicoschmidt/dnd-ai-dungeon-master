@@ -213,8 +213,10 @@ tool contract, which is the point of designing the contracts from the domain.
 
 ## The opponent
 
-One stat block, from **SRD 5.2** under CC-BY-4.0 with the attribution the
-licence requires. The system holds, for the opponent:
+One stat block, from the **SRD 5.2.1** under CC-BY-4.0 with the attribution
+the licence requires: the **Ogre** (challenge rating 2, one attack per turn, no
+special rules the code would have to ignore). The system holds, for the
+opponent:
 
 - name, armour class, hit points (the stat block's fixed value, not rolled)
 - Dexterity modifier for initiative, and saving throw modifiers
@@ -226,10 +228,22 @@ licence requires. The system holds, for the opponent:
 It is loaded through the `AdventureRepository` port
 ([ADR-0003](../adr/0003-adventure-content-separation.md)), from an in-memory
 implementation in iteration 001. From iteration 002 an opponent comes out of an
-adventure package instead, and nothing above the port changes.
+adventure package instead, and nothing above the port changes. Active
+conditions are state rather than stat block: the session holds them once the
+encounter runs, not the content.
 
 The premise that frames the fight — two or three sentences, where and why — is
 original text written for this project and stored with the opponent's fixture.
+
+Both live in `src/dungeon_master/adventure/fixtures/iteration-001/`, laid out
+like an adventure package, with their provenance and the SRD's attribution
+statement in `fixtures/PROVENANCE.md`. The model in
+`src/dungeon_master/adventure/models.py` — `Monster`, `MonsterAttack`,
+`SavingThrows`, `EncounterSetup` — is written so that the monster entry of the
+v1 adventure schema (#4) can adopt its field names as they are.
+
+The Ogre's three javelins are not counted: whether it has one left to throw is
+the model's judgement, like distance.
 
 Everything about the opponent except its name and what the narration reveals is
 hidden from the table. The game master view shows all of it.
