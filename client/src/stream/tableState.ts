@@ -65,3 +65,10 @@ export function applyEvent(state: TableState, event: TableEvent): TableState {
       return { ...state, error: event }
   }
 }
+
+// Whose turn it is, when it is a character's: the one the input preselects.
+export function actingCharacterId(encounter: Encounter | null): string | null {
+  if (!encounter || encounter.current_turn === null || encounter.outcome) return null
+  const combatant = encounter.turn_order[encounter.current_turn]
+  return combatant?.kind === 'character' ? combatant.id : null
+}

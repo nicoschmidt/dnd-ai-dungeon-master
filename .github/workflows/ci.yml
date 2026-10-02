@@ -85,6 +85,9 @@ jobs:
             exit 1
           }
 
+      - name: Tests
+        run: npm test
+
       - name: Lint
         run: npm run lint
 

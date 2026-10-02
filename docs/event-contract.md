@@ -51,6 +51,11 @@ table's state from events alone, and a hook that listens for every event type
 by name. It notices a backend restart by the changed session id in the event
 ids, and rebuilds its state instead of appending to it.
 
+The status panel (`client/src/party/StatusPanel.tsx`) renders the party and
+the encounter from that state, which is to say from `party_updated` and
+`encounter_updated` and nothing else. The input preselects the character whose
+turn `encounter_updated` says it is.
+
 ## Events
 
 Every event names its type twice: as the SSE `event:` field, so the client

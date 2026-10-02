@@ -27,3 +27,47 @@ form {
 form input {
   flex: 1;
 }
+
+.status ul {
+  list-style: none;
+  padding: 0;
+}
+
+.status li {
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid transparent;
+}
+
+.status li.acting {
+  border-left-color: currentColor;
+  font-weight: 600;
+}
+
+.status .class,
+.status .temporary,
+.status .conditions {
+  opacity: 0.75;
+}
+
+.party-form fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.party-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+}
+
+.party-form input {
+  width: 6rem;
+}
+
+.party-form .error {
+  color: #c62828;
+  max-width: 12rem;
+}
