@@ -9,11 +9,12 @@ import asyncio
 import json
 from pathlib import Path
 
-import httpx2
 import pytest
 from fastapi import FastAPI
 
 from fakes import Call, Fail, Hold, Say, ScriptedDungeonMaster
+from table_client import client as _client
+from table_client import frames as _frames
 
 from dungeon_master.api.app import create_app
 from dungeon_master.events.contract import NarrationDelta, TableError
@@ -36,25 +37,6 @@ def _app(tmp_path: Path, dungeon_master) -> FastAPI:
 
 def _table(app: FastAPI) -> TableSession:
     return app.state.session
-
-
-def _client(app: FastAPI) -> httpx2.AsyncClient:
-    return httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app), base_url="http://table")
-
-
-def _frames(body: str) -> list[dict[str, str]]:
-    """Parse an SSE body into its frames, as an EventSource would see them."""
-    frames = []
-    for block in body.strip().split("\n\n"):
-        frame = {}
-        for line in block.splitlines():
-            if line.startswith(":"):
-                continue
-            name, _, value = line.partition(": ")
-            frame[name] = value
-        if frame:
-            frames.append(frame)
-    return frames
 
 
 async def _declare_and_read(app: FastAPI, text: str, last_event_id: str | None = None):

@@ -1,4 +1,4 @@
-"""The table's two routes: the event stream out, the declared action in.
+"""The table's routes: the event stream out; the declared action and the party in.
 
 Thin by intent (ADR-0005, commitment 4): each handler translates HTTP into one
 call on the session and back.
@@ -11,8 +11,8 @@ from fastapi import APIRouter, Header, HTTPException, Request, status
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel
 
-from ..events.contract import DeclaredAction
-from ..orchestration.session import TableSession
+from ..events.contract import Character, DeclaredAction, PartyEntry
+from ..orchestration.session import PartyLocked, TableSession, UnknownCharacter
 from ..orchestration.turn import TurnInProgress
 
 router = APIRouter(prefix="/api/session")
@@ -43,9 +43,25 @@ async def stream(
 async def declare_action(request: Request, action: DeclaredAction) -> TurnAccepted:
     """Start a turn. Its narration and state changes arrive on the stream."""
     try:
-        turn_id = _session(request).turns.start(action)
+        turn_id = _session(request).declare_action(action)
+    except UnknownCharacter as error:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, f"No character {error.args[0]!r} in the party."
+        ) from None
     except TurnInProgress:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "The dungeon master is still answering the last action."
         ) from None
     return TurnAccepted(turn_id=turn_id)
+
+
+@router.put("/party")
+async def enter_party(request: Request, entry: PartyEntry) -> list[Character]:
+    """Replace the party, until the encounter starts. The table hears of it on the stream."""
+    try:
+        return _session(request).enter_party(entry)
+    except PartyLocked:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "The encounter has started. Only the dungeon master's tools change the party now.",
+        ) from None

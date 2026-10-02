@@ -12,12 +12,16 @@
     },
     "action": {
       "$ref": "#/$defs/DeclaredAction"
+    },
+    "party_entry": {
+      "$ref": "#/$defs/PartyEntry"
     }
   },
   "required": [
     "contract_version",
     "event",
-    "action"
+    "action",
+    "party_entry"
   ],
   "additionalProperties": false,
   "$defs": {
@@ -100,6 +104,62 @@
         "conditions"
       ],
       "title": "Character",
+      "type": "object"
+    },
+    "CharacterEntry": {
+      "additionalProperties": false,
+      "description": "One character as the group types it in before the encounter.",
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "character_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "level": {
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "armour_class": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_hit_points": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "current_hit_points": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Leave empty for the maximum."
+        },
+        "temporary_hit_points": {
+          "default": 0,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "character_class",
+        "level",
+        "armour_class",
+        "max_hit_points",
+        "current_hit_points",
+        "temporary_hit_points"
+      ],
+      "title": "CharacterEntry",
       "type": "object"
     },
     "Combatant": {
@@ -268,6 +328,23 @@
         "text"
       ],
       "title": "NarrationDelta",
+      "type": "object"
+    },
+    "PartyEntry": {
+      "additionalProperties": false,
+      "description": "The whole party as the group types it in. Replaces the party held so far.",
+      "properties": {
+        "characters": {
+          "items": {
+            "$ref": "#/$defs/CharacterEntry"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "characters"
+      ],
+      "title": "PartyEntry",
       "type": "object"
     },
     "PartyUpdated": {
