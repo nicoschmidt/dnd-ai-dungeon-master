@@ -102,17 +102,17 @@ does not name.
 
 | Tool | Arguments | Implemented |
 | --- | --- | --- |
-| `start_encounter` | `opponent_id` | refuses until #29 and #31 |
-| `record_initiative` | `character_id`, `total` | refuses until #29 |
-| `resolve_player_attack` | `character_id`, `total`, `natural_roll` (1 or 20, optional) | refuses until #29 and #31 |
-| `opponent_saving_throw` | `ability`, `dc`, `mode` | refuses until #29 and #31 |
-| `opponent_attack` | `attack`, `target_id`, `mode` | refuses until #29 and #31 |
-| `apply_damage` | `target`, `amount`, `damage_type`, `halved_on_save`, `critical` | refuses until #29 |
-| `heal` | `character_id`, `amount` | refuses until #29 |
-| `set_temporary_hit_points` | `character_id`, `amount` | refuses until #29 |
-| `add_condition`, `remove_condition` | `target`, `condition` | for characters; the opponent refuses until #31 |
-| `end_turn` | — | refuses until #29 |
-| `end_encounter` | `outcome` | refuses until #29 |
+| `start_encounter` | `opponent_id` | refuses until #31 and #49 |
+| `record_initiative` | `character_id`, `total`, `dexterity_modifier` | refuses until #49 |
+| `resolve_player_attack` | `character_id`, `total`, `natural_roll` (1 or 20, optional) | refuses until #31 and #49 |
+| `opponent_saving_throw` | `ability`, `dc`, `mode` | refuses until #31 and #49 |
+| `opponent_attack` | `attack`, `target_id`, `mode` | refuses until #31 and #49 |
+| `apply_damage` | `target`, `amount`, `damage_type`, `halved_on_save`, `critical` | for characters; the opponent refuses until #31 and #49 |
+| `heal` | `character_id`, `amount` | yes |
+| `set_temporary_hit_points` | `character_id`, `amount` | yes |
+| `add_condition`, `remove_condition` | `target`, `condition` | for characters; the opponent refuses until #31 and #49 |
+| `end_turn` | — | refuses until #49 |
+| `end_encounter` | `outcome` | refuses until #49 |
 | `update_plan` | `plan` | refuses until #34 |
 
 `target` is a character's id or `opponent`. `mode` is `normal`, `advantage` or
@@ -124,6 +124,13 @@ arguments that do not fit the schema before any handler runs, and it compares
 the party and the encounter before and after the handler. When either differs,
 it publishes `party_updated` or `encounter_updated` with the new state. No
 tool declares what it changes, so none can forget to say so.
+
+**Handlers do no arithmetic.** They translate between the session's models and
+the rules core in `src/dungeon_master/rules/`, which decides everything
+[docs/domain/combat.md](domain/combat.md) gives to the code, and write the
+result back. The result the model reads says what happened: damage taken, how
+much the temporary hit points absorbed, failed death saves to mark, the new
+hit points and conditions.
 
 **A refusal is a result, not an error.** It carries a reason the model reads,
 so the dungeon master can correct itself rather than narrate something the

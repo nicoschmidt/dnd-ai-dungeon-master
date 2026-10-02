@@ -42,6 +42,8 @@ The game:
 - #29 — deterministic combat in the rules core
 - #30 — entering the party, and the status panel
 - #31 — the opponent: an SRD stat block through the adventure port
+- #49 — the encounter and opponent tools wired to the rules core; split off #29,
+  which builds the rules but not the opponent state they need
 - #32 — running the agent on the subscription or on an API key
 
 Seeing what happened:

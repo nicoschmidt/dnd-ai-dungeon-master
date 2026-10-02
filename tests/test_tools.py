@@ -127,16 +127,119 @@ def test_an_unknown_character_is_refused_with_the_known_ones(toolbox: ToolBox) -
     assert "brann" in result.reason
 
 
-def test_a_tool_not_yet_deterministic_refuses_and_names_its_issue(
+def test_a_tool_not_yet_connected_refuses_and_names_its_issue(
+    toolbox: ToolBox, published: list
+) -> None:
+    result = toolbox.call("opponent_attack", {"attack": "Greatclub", "target_id": "brann"})
+
+    assert not result.ok
+    assert "#49" in result.reason
+    assert published == []
+
+
+def test_damage_to_the_opponent_refuses_until_it_is_connected(
     toolbox: ToolBox, published: list
 ) -> None:
     result = toolbox.call(
-        "apply_damage", {"target": "brann", "amount": 7, "damage_type": "slashing"}
+        "apply_damage", {"target": "opponent", "amount": 7, "damage_type": "slashing"}
     )
 
     assert not result.ok
-    assert "#29" in result.reason
+    assert "#49" in result.reason
     assert published == []
+
+
+def test_damage_lands_on_the_character_and_the_table_hears_of_it(
+    toolbox: ToolBox, state: SessionState, published: list
+) -> None:
+    state.party[0].temporary_hit_points = 5
+
+    result = toolbox.call(
+        "apply_damage", {"target": "brann", "amount": 12, "damage_type": "bludgeoning"}
+    )
+
+    assert result.ok
+    assert result.data["absorbed_by_temporary_hit_points"] == 5
+    assert (state.party[0].current_hit_points, state.party[0].temporary_hit_points) == (21, 0)
+    assert [(e.party[0].current_hit_points, e.party[0].temporary_hit_points) for e in published] == [
+        (21, 0)
+    ]
+
+
+def test_damage_to_zero_makes_the_character_unconscious(
+    toolbox: ToolBox, state: SessionState
+) -> None:
+    state.party[0].conditions = ["prone"]
+
+    result = toolbox.call(
+        "apply_damage", {"target": "brann", "amount": 30, "damage_type": "slashing"}
+    )
+
+    assert result.ok
+    assert state.party[0].current_hit_points == 0
+    assert state.party[0].conditions == ["prone", "unconscious"]
+
+
+def test_a_critical_hit_at_zero_reports_two_failed_death_saves(
+    toolbox: ToolBox, state: SessionState
+) -> None:
+    state.party[0].current_hit_points = 0
+    state.party[0].conditions = ["unconscious", "stable"]
+
+    result = toolbox.call(
+        "apply_damage",
+        {"target": "brann", "amount": 4, "damage_type": "piercing", "critical": True},
+    )
+
+    assert result.data["death_save_failures"] == 2
+    assert state.party[0].conditions == ["unconscious"]
+
+
+def test_halving_on_a_save_is_the_codes_arithmetic(
+    toolbox: ToolBox, state: SessionState
+) -> None:
+    result = toolbox.call(
+        "apply_damage",
+        {"target": "brann", "amount": 9, "damage_type": "fire", "halved_on_save": True},
+    )
+
+    assert result.data["damage_taken"] == 4
+    assert state.party[0].current_hit_points == 24
+
+
+def test_healing_from_zero_wakes_the_character_and_stops_at_the_maximum(
+    toolbox: ToolBox, state: SessionState, published: list
+) -> None:
+    state.party[0].current_hit_points = 0
+    state.party[0].conditions = ["unconscious", "stable"]
+
+    result = toolbox.call("heal", {"character_id": "brann", "amount": 40})
+
+    assert result.data["healed"] == 28
+    assert (state.party[0].current_hit_points, state.party[0].conditions) == (28, [])
+    assert len(published) == 1
+
+
+def test_a_dead_character_cannot_be_healed(
+    toolbox: ToolBox, state: SessionState, published: list
+) -> None:
+    state.party[0].current_hit_points = 0
+    state.party[0].conditions = ["dead"]
+
+    result = toolbox.call("heal", {"character_id": "brann", "amount": 5})
+
+    assert not result.ok
+    assert published == []
+
+
+def test_temporary_hit_points_keep_the_higher_value(
+    toolbox: ToolBox, state: SessionState, published: list
+) -> None:
+    toolbox.call("set_temporary_hit_points", {"character_id": "brann", "amount": 8})
+    toolbox.call("set_temporary_hit_points", {"character_id": "brann", "amount": 5})
+
+    assert state.party[0].temporary_hit_points == 8
+    assert [e.party[0].temporary_hit_points for e in published] == [8]
 
 
 def test_an_encounter_change_publishes_the_public_encounter(
