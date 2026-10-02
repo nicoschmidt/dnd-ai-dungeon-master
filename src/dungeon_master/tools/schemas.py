@@ -4,30 +4,13 @@ Their meaning is docs/domain/combat.md's; the descriptions here are what the
 model reads, so they say what to pass rather than how the code works.
 """
 
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field
 
+from ..rules.damage import DamageType
+from ..rules.dice import Mode
+from ..rules.encounter import Outcome
+from ..rules.saving_throws import Ability
 from ..session.party import Condition
-from ..session.state import Outcome
-
-Mode = Literal["normal", "advantage", "disadvantage"]
-Ability = Literal["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
-DamageType = Literal[
-    "acid",
-    "bludgeoning",
-    "cold",
-    "fire",
-    "force",
-    "lightning",
-    "necrotic",
-    "piercing",
-    "poison",
-    "psychic",
-    "radiant",
-    "slashing",
-    "thunder",
-]
 
 OPPONENT = "opponent"
 TARGET_DESCRIPTION = f"A character's id, or {OPPONENT!r} for the opponent."
@@ -44,6 +27,9 @@ class StartEncounter(Arguments):
 class RecordInitiative(Arguments):
     character_id: str
     total: int = Field(description="The initiative total the player reported.")
+    dexterity_modifier: int = Field(
+        description="The Dexterity modifier the player added. Decides a tie with the opponent."
+    )
 
 
 class ResolvePlayerAttack(Arguments):

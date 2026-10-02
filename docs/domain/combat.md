@@ -70,15 +70,24 @@ modifier, rolled and added at the table.
 
 ### 2. Initiative
 
-Each reported total is recorded. The code rolls the opponent's initiative when
-the encounter starts. Once every character has a value, the turn order is
-fixed for the encounter:
+Each reported total is recorded, together with the Dexterity modifier the
+player added: a tie with the opponent cannot be decided without it, and the
+model cannot see the opponent's total to know whether to ask. The modifier is
+held for the encounter only, not on the character. The code rolls the
+opponent's initiative when the encounter starts. Once every character has a
+value, the turn order is fixed for the encounter:
 
 - highest first
 - a tie between a character and the opponent goes to the higher Dexterity
   modifier; if that ties too, the character goes first
 - ties between characters are resolved in the order the players reported them;
   the table can reorder them before the first turn
+
+When several characters tie with the opponent, each is placed against the
+opponent by the rule above: those whose modifier is at least the opponent's go
+before it, the others after it, and each of those two groups keeps the order
+the players reported. That can put a later-reported character first; the
+pairwise rule against the opponent wins over the reporting order.
 
 The order and the current round are public. The opponent's initiative total is
 not.
@@ -111,8 +120,9 @@ success, an effect that deals half damage is applied **halved, rounded down, by
 the code**; the model says so in the tool call rather than halving in its head.
 
 **Healing and temporary hit points** on a character: the player reports the
-amount. Healing never raises current hit points above the maximum. Temporary
-hit points do not stack: the higher value is kept.
+amount. Healing never raises current hit points above the maximum, and a dead
+character cannot be healed. Temporary hit points do not stack: the higher value
+is kept.
 
 **Anything else** — dashing, hiding, helping, dodging, talking, a skill check —
 is adjudicated narratively by the model in iteration 001. It may set a
@@ -155,12 +165,15 @@ cannot disagree.
 
 Applied by the code, in this order, whoever the target is:
 
-1. **Resistance or vulnerability** from the target's stat block: halved rounded
+1. **Halving on a successful save**, rounded down, when the effect deals half
+   damage on a success. It comes first: the save decides how much damage the
+   effect deals, and the target's defences then apply to that.
+2. **Resistance or vulnerability** from the target's stat block: halved rounded
    down, or doubled. Immunity reduces the damage to 0. Characters declare none
    in iteration 001 — a player whose character resists a type says so, and the
    model reports the reduced amount.
-2. **Temporary hit points** absorb damage first.
-3. **Current hit points** take the rest, never below 0.
+3. **Temporary hit points** absorb damage first.
+4. **Current hit points** take the rest, never below 0.
 
 At 0 hit points:
 
@@ -170,7 +183,11 @@ At 0 hit points:
   If the damage left over after reaching 0 is at least the character's maximum
   hit points, the character dies outright, and the code sets `dead` instead.
 - **Damage to a character already at 0** is a failed death saving throw — two
-  on a critical hit. The model tells the player to mark it on the sheet.
+  on a critical hit. The model tells the player to mark it on the sheet. It
+  also ends `stable`. And since all of it is left over after reaching 0, the
+  rule above applies too: damage at least the character's maximum hit points
+  kills outright.
+- **Damage to a dead target** is refused.
 
 Death saving throws stay on paper. The sheet has the boxes, the player rolls
 and tallies, and nothing about them is arithmetic the system needs to
@@ -236,7 +253,7 @@ follows the table above.
 | Tool | Changes | Notes |
 | --- | --- | --- |
 | `start_encounter` | encounter, opponent | rolls the opponent's initiative |
-| `record_initiative` | turn order | one call per character |
+| `record_initiative` | turn order | one call per character, with the Dexterity modifier |
 | `resolve_player_attack` | nothing | returns hit, miss or critical hit |
 | `opponent_saving_throw` | nothing | returns success or failure |
 | `opponent_attack` | the target character | rolls, compares, applies damage |
