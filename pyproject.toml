@@ -9,7 +9,9 @@ description = "An AI dungeon master for tabletop Dungeons & Dragons"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi",
+    # The table's stream uses fastapi.sse; 0.141 is the oldest version tested.
+    "fastapi>=0.141",
+    "pydantic>=2.11",
     "uvicorn[standard]",
 ]
 

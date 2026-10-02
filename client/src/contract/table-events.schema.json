@@ -1,0 +1,445 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TableContract",
+  "description": "The table's event contract, version 1. Generated from dungeon_master.events.contract by `python -m dungeon_master.events.schema`; do not edit by hand.",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "event": {
+      "$ref": "#/$defs/TableEvent"
+    },
+    "action": {
+      "$ref": "#/$defs/DeclaredAction"
+    }
+  },
+  "required": [
+    "contract_version",
+    "event",
+    "action"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Character": {
+      "additionalProperties": false,
+      "description": "One player character, as the system holds it (ADR-0004).",
+      "properties": {
+        "id": {
+          "description": "Stable identity within the session; tools address the character by it.",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "character_class": {
+          "description": "For narration only.",
+          "minLength": 1,
+          "title": "Character Class",
+          "type": "string"
+        },
+        "level": {
+          "description": "For narration only.",
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Level",
+          "type": "integer"
+        },
+        "armour_class": {
+          "minimum": 0,
+          "title": "Armour Class",
+          "type": "integer"
+        },
+        "max_hit_points": {
+          "minimum": 1,
+          "title": "Max Hit Points",
+          "type": "integer"
+        },
+        "current_hit_points": {
+          "minimum": 0,
+          "title": "Current Hit Points",
+          "type": "integer"
+        },
+        "temporary_hit_points": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Temporary Hit Points",
+          "type": "integer"
+        },
+        "conditions": {
+          "items": {
+            "enum": [
+              "blinded",
+              "charmed",
+              "deafened",
+              "exhaustion",
+              "frightened",
+              "grappled",
+              "incapacitated",
+              "invisible",
+              "paralyzed",
+              "petrified",
+              "poisoned",
+              "prone",
+              "restrained",
+              "stunned",
+              "unconscious",
+              "stable",
+              "dead"
+            ],
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "character_class",
+        "level",
+        "armour_class",
+        "max_hit_points",
+        "current_hit_points",
+        "temporary_hit_points",
+        "conditions"
+      ],
+      "title": "Character",
+      "type": "object"
+    },
+    "Combatant": {
+      "additionalProperties": false,
+      "description": "One place in the turn order.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "character",
+            "opponent"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "name"
+      ],
+      "title": "Combatant",
+      "type": "object"
+    },
+    "DeclaredAction": {
+      "additionalProperties": false,
+      "description": "What a player typed: the declared action and the dice they rolled.",
+      "properties": {
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "character_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The acting character, when the client knows it.",
+          "title": "Character Id"
+        }
+      },
+      "required": [
+        "text",
+        "character_id"
+      ],
+      "title": "DeclaredAction",
+      "type": "object"
+    },
+    "Encounter": {
+      "additionalProperties": false,
+      "description": "What the table may know about the encounter (docs/domain/combat.md).\n\nThe opponent's numbers are not here: they are hidden from the table and\nbelong to the opponent's own state (#31).",
+      "properties": {
+        "opponent_name": {
+          "title": "Opponent Name",
+          "type": "string"
+        },
+        "round": {
+          "default": 0,
+          "description": "0 until the turn order is fixed.",
+          "minimum": 0,
+          "title": "Round",
+          "type": "integer"
+        },
+        "turn_order": {
+          "items": {
+            "$ref": "#/$defs/Combatant"
+          },
+          "title": "Turn Order",
+          "type": "array"
+        },
+        "current_turn": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Index into turn_order of whoever acts now.",
+          "title": "Current Turn"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "enum": [
+                "opponent_defeated",
+                "opponent_fled",
+                "party_fled",
+                "party_defeated",
+                "parley"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when the encounter has ended.",
+          "title": "Outcome"
+        }
+      },
+      "required": [
+        "opponent_name",
+        "round",
+        "turn_order",
+        "current_turn",
+        "outcome"
+      ],
+      "title": "Encounter",
+      "type": "object"
+    },
+    "EncounterUpdated": {
+      "additionalProperties": false,
+      "description": "The public state of the encounter, after a tool changed it.",
+      "properties": {
+        "type": {
+          "const": "encounter_updated",
+          "default": "encounter_updated",
+          "title": "Type",
+          "type": "string"
+        },
+        "encounter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Encounter"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "encounter"
+      ],
+      "title": "EncounterUpdated",
+      "type": "object"
+    },
+    "NarrationDelta": {
+      "additionalProperties": false,
+      "description": "The next piece of narration, as the model writes it.",
+      "properties": {
+        "type": {
+          "const": "narration_delta",
+          "default": "narration_delta",
+          "title": "Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "turn_id",
+        "text"
+      ],
+      "title": "NarrationDelta",
+      "type": "object"
+    },
+    "PartyUpdated": {
+      "additionalProperties": false,
+      "description": "The whole party as the backend holds it, after a tool changed it.",
+      "properties": {
+        "type": {
+          "const": "party_updated",
+          "default": "party_updated",
+          "title": "Type",
+          "type": "string"
+        },
+        "party": {
+          "items": {
+            "$ref": "#/$defs/Character"
+          },
+          "title": "Party",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "party"
+      ],
+      "title": "PartyUpdated",
+      "type": "object"
+    },
+    "TableError": {
+      "additionalProperties": false,
+      "description": "Something went wrong that the table should know about.\n\nThe message is written for the table. It never carries an exception's\ntext, which could carry a credential (ADR-0007).",
+      "properties": {
+        "type": {
+          "const": "error",
+          "default": "error",
+          "title": "Type",
+          "type": "string"
+        },
+        "code": {
+          "const": "agent_failed",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "turn_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Turn Id"
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "message",
+        "turn_id"
+      ],
+      "title": "TableError",
+      "type": "object"
+    },
+    "TableEvent": {
+      "title": "TableEvent",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TurnStarted"
+        },
+        {
+          "$ref": "#/$defs/NarrationDelta"
+        },
+        {
+          "$ref": "#/$defs/TurnFinished"
+        },
+        {
+          "$ref": "#/$defs/PartyUpdated"
+        },
+        {
+          "$ref": "#/$defs/EncounterUpdated"
+        },
+        {
+          "$ref": "#/$defs/TableError"
+        }
+      ],
+      "discriminator": {
+        "propertyName": "type",
+        "mapping": {
+          "turn_started": "#/$defs/TurnStarted",
+          "narration_delta": "#/$defs/NarrationDelta",
+          "turn_finished": "#/$defs/TurnFinished",
+          "party_updated": "#/$defs/PartyUpdated",
+          "encounter_updated": "#/$defs/EncounterUpdated",
+          "error": "#/$defs/TableError"
+        }
+      }
+    },
+    "TurnFinished": {
+      "additionalProperties": false,
+      "description": "The dungeon master has finished answering; the next action may be declared.",
+      "properties": {
+        "type": {
+          "const": "turn_finished",
+          "default": "turn_finished",
+          "title": "Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "turn_id"
+      ],
+      "title": "TurnFinished",
+      "type": "object"
+    },
+    "TurnStarted": {
+      "additionalProperties": false,
+      "description": "A declared action was accepted, and the dungeon master is answering it.",
+      "properties": {
+        "type": {
+          "const": "turn_started",
+          "default": "turn_started",
+          "title": "Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/DeclaredAction"
+        }
+      },
+      "required": [
+        "type",
+        "turn_id",
+        "action"
+      ],
+      "title": "TurnStarted",
+      "type": "object"
+    }
+  }
+}

@@ -63,11 +63,12 @@ per component of the [architecture](docs/architecture.md):
 | --- | --- | --- |
 | `dungeon_master.api` | API layer | FastAPI — the only package that may |
 | `dungeon_master.orchestration` | Session orchestration | Claude Agent SDK — the only package that may |
-| `dungeon_master.tools` | Tool layer | rules core, session state |
+| `dungeon_master.tools` | Tool layer | rules core, session state, events — neither a web framework nor the SDK |
+| `dungeon_master.events` | The table's event contract | session state — neither a web framework nor the SDK |
 | `dungeon_master.rules` | Rules core | neither a web framework nor the SDK |
 | `dungeon_master.session` | Session state | neither a web framework nor the SDK |
 
-The last two rows are enforced, not merely intended:
+The last four rows are enforced, not merely intended:
 `tests/test_layer_boundary.py` fails on any such import, and CI runs it on
 every pull request.
 
@@ -78,6 +79,8 @@ backend in `tests/`.
 
 - [Vision and scope](docs/vision.md)
 - [Architecture](docs/architecture.md)
+- [The table's event contract](docs/event-contract.md) — what the shared
+  screen receives, and what it sends
 - [Decision records](docs/adr/README.md)
 - [Process](docs/process.md) — how work moves from issue to merge
 - [Working agreements for AI assistants](CLAUDE.md)

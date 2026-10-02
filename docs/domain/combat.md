@@ -2,8 +2,8 @@
 
 What iteration 001 has to adjudicate, and who adjudicates each part of it: the
 code, the model, or the players with their paper sheets. This is a domain
-document. The event payloads and tool argument schemas are defined in the event
-contract (#23); this file defines what they mean.
+document. The event payloads and tool argument schemas are defined in
+[the event contract](../event-contract.md); this file defines what they mean.
 
 It describes 5e mechanics in this project's own words. Rules material comes from
 the System Reference Document under CC-BY-4.0, never from a book. See
