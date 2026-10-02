@@ -14,14 +14,17 @@ committed. A test fails when the schema is stale, and CI fails when the
 TypeScript is.
 
 The contract is versioned (`CONTRACT_VERSION`, currently 1) and changed
-deliberately, like the adventure schema.
+deliberately, like the adventure schema. The version goes up when an existing
+shape changes — a field renamed, removed or given a new meaning. An addition
+that every existing reader can ignore does not change it.
 
 ## Endpoints
 
 | Route | Does |
 | --- | --- |
 | `GET /api/session/stream` | The table's event stream, `text/event-stream`. Opened once by the page and kept open. |
-| `POST /api/session/actions` | Declare an action. Body: a `DeclaredAction`. Answers `202` with the `turn_id`; everything the turn produces arrives on the stream. `409` while a turn is still running — interrupting the dungeon master is deliberately not possible (ADR-0005). `422` for a body that does not fit. |
+| `POST /api/session/actions` | Declare an action. Body: a `DeclaredAction`. Answers `202` with the `turn_id`; everything the turn produces arrives on the stream. `409` while a turn is still running — interrupting the dungeon master is deliberately not possible (ADR-0005). `422` for a body that does not fit, or a `character_id` that is not in the party. |
+| `PUT /api/session/party` | Enter the party. Body: a `PartyEntry`. Replaces the whole party, answers `200` with it, and publishes `party_updated`. `409` once the encounter has started: from then on only the dungeon master's tools change the party. `422` for a party that does not fit. |
 
 One table, one session, in one process. The session lives as long as the
 backend does.
@@ -89,8 +92,26 @@ the turn; the action can be declared again. #32 adds the credential errors.
 ## The declared action
 
 `DeclaredAction` is what a player sends: `text`, the declared action with the
-dice they rolled in their own words, and `character_id`, the acting character
-when the client knows it (from #30 on), else `null`.
+dice they rolled in their own words, and `character_id`, the acting character,
+or `null` when the action is the table's rather than one character's. The
+client preselects whoever's turn it is.
+
+## Entering the party
+
+`PartyEntry` is the party as the group types it in before the fight
+([ADR-0004](adr/0004-character-state-ownership.md): once per campaign; without
+persistence, once per session). Each `CharacterEntry` has the fields the system
+owns except `id` and `conditions`. `current_hit_points` may be `null`, meaning
+the maximum. Names must be unique, ignoring case.
+
+The backend derives each `id` from the name — lower case, accents folded to
+ASCII, `ß` to `ss`, everything else to `-` (`Jörg Weiß` becomes
+`jorg-weiss`); a collision gets `-2`. A character entered again under the
+same name keeps its id and its conditions.
+
+The same constraints are checked in the client before sending
+(`client/src/party/validateParty.ts`) and by Pydantic on arrival. The
+backend's answer is the one that counts; the client shows its messages too.
 
 ## The dungeon master's tools
 

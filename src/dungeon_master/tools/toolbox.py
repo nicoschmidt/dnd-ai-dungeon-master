@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..events.contract import EncounterUpdated, PartyUpdated, TableEvent
+from ..session.party import Character
 from ..session.state import SessionState
 from .registry import TOOLS, ToolSpec
 from .result import ToolResult
@@ -34,6 +35,10 @@ class ToolBox:
     @property
     def specs(self) -> tuple[ToolSpec, ...]:
         return tuple(self._tools.values())
+
+    def party(self) -> list[Character]:
+        """The party, to read. A copy: changes go through `call`."""
+        return [c.model_copy(deep=True) for c in self._state.party]
 
     def call(self, name: str, arguments: Mapping[str, Any]) -> ToolResult:
         tool = self._tools.get(name)

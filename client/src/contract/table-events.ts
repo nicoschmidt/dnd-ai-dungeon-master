@@ -18,6 +18,7 @@ export interface TableContract {
   contract_version: 1
   event: TableEvent
   action: DeclaredAction
+  party_entry: PartyEntry
 }
 /**
  * A declared action was accepted, and the dungeon master is answering it.
@@ -178,4 +179,31 @@ export interface TableError {
   code: 'agent_failed'
   message: string
   turn_id: string | null
+}
+/**
+ * The whole party as the group types it in. Replaces the party held so far.
+ *
+ * This interface was referenced by `TableContract`'s JSON-Schema
+ * via the `definition` "PartyEntry".
+ */
+export interface PartyEntry {
+  characters: CharacterEntry[]
+}
+/**
+ * One character as the group types it in before the encounter.
+ *
+ * This interface was referenced by `TableContract`'s JSON-Schema
+ * via the `definition` "CharacterEntry".
+ */
+export interface CharacterEntry {
+  name: string
+  character_class: string
+  level: number
+  armour_class: number
+  max_hit_points: number
+  /**
+   * Leave empty for the maximum.
+   */
+  current_hit_points: number | null
+  temporary_hit_points: number
 }

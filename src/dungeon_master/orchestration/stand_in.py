@@ -18,7 +18,9 @@ class StandInDungeonMaster:
         self._delay = delay
 
     async def take_turn(self, action: DeclaredAction, tools: ToolBox) -> AsyncIterator[str]:
-        text = f"No dungeon master is connected yet. You declared: {action.text}"
+        speaker = next((c.name for c in tools.party() if c.id == action.character_id), None)
+        declared = f"You declared, {speaker}" if speaker else "You declared"
+        text = f"No dungeon master is connected yet. {declared}: {action.text}"
         for word in re.findall(r"\S+\s*", text):
             await asyncio.sleep(self._delay)
             yield word

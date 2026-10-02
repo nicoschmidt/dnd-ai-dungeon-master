@@ -14,7 +14,7 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from .contract import CONTRACT_VERSION, DeclaredAction, TableEvent
+from .contract import CONTRACT_VERSION, DeclaredAction, PartyEntry, TableEvent
 
 DEFAULT_OUTPUT = (
     Path(__file__).resolve().parents[3] / "client" / "src" / "contract" / "table-events.schema.json"
@@ -31,6 +31,7 @@ def contract_schema() -> dict:
         [
             ("event", "serialization", TypeAdapter(TableEvent)),
             ("action", "serialization", TypeAdapter(DeclaredAction)),
+            ("party", "serialization", TypeAdapter(PartyEntry)),
         ],
         ref_template="#/$defs/{model}",
     )
@@ -54,8 +55,9 @@ def contract_schema() -> dict:
             "contract_version": {"const": CONTRACT_VERSION},
             "event": {"$ref": "#/$defs/TableEvent"},
             "action": refs[("action", "serialization")],
+            "party_entry": refs[("party", "serialization")],
         },
-        "required": ["contract_version", "event", "action"],
+        "required": ["contract_version", "event", "action", "party_entry"],
         "additionalProperties": False,
         "$defs": dict(sorted(defs.items())),
     }

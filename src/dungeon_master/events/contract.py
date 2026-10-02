@@ -5,16 +5,35 @@ number on the status panel arrives as `party_updated`, never inside
 `narration_delta`. The set of event types is closed by construction, because
 `TableEvent` is a discriminated union on `type`.
 
-The wire format is versioned. Change it deliberately: bump `CONTRACT_VERSION`,
-regenerate the schema and the client's types, and describe the change in
-docs/domain/event-contract.md.
+The wire format is versioned. Change it deliberately: bump `CONTRACT_VERSION`
+when an existing shape changes (an addition does not), regenerate the schema
+and the client's types, and describe the change in docs/event-contract.md.
+
+`CharacterEntry` and `PartyEntry`, the body of `PUT /api/session/party`, live
+with the party in session state and are part of this contract too.
 """
+
+__all__ = [
+    "CONTRACT_VERSION",
+    "Character",
+    "CharacterEntry",
+    "DeclaredAction",
+    "EncounterUpdated",
+    "NarrationDelta",
+    "PartyEntry",
+    "PartyUpdated",
+    "TableError",
+    "TableEvent",
+    "TurnFinished",
+    "TurnStarted",
+    "table_event_adapter",
+]
 
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
-from ..session.party import Character
+from ..session.party import Character, CharacterEntry, PartyEntry
 from ..session.state import Encounter
 
 CONTRACT_VERSION = 1
