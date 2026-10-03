@@ -9,8 +9,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from ..session.state import SessionState
 from . import handlers, schemas
+from .context import ToolContext
 from .result import ToolResult
 
 
@@ -19,7 +19,7 @@ class ToolSpec:
     name: str
     description: str
     arguments: type[schemas.Arguments]
-    handler: Callable[[SessionState, Any], ToolResult]
+    handler: Callable[[ToolContext, Any], ToolResult]
 
 
 TOOLS: tuple[ToolSpec, ...] = (

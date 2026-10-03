@@ -122,7 +122,8 @@ def build_party(entry: PartyEntry, existing: list[Character]) -> list[Character]
     """The party the entry describes. A character entered again keeps its conditions."""
     conditions = {c.id: list(c.conditions) for c in existing}
     party: list[Character] = []
-    taken: set[str] = set()
+    # The tools address the opponent as `opponent`; no character may share it.
+    taken: set[str] = {"opponent"}
     for position, character in enumerate(entry.characters, start=1):
         id = character_id(character.name, taken, position)
         taken.add(id)

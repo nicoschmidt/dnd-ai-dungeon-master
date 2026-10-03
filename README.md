@@ -13,9 +13,11 @@ process that serves the API and the built client; the table's event stream,
 with narration arriving word by word; a form to enter the party and a status
 panel that shows it; an input for the declared action, with the acting
 character preselected; the rules of combat in deterministic code; an opponent,
-the SRD's Ogre, through the adventure port; and the dungeon master's tools, of
-which damage, healing, temporary hit points and conditions on characters work
-so far. Until the agent runs on a model, a stand-in answers.
+the SRD's Ogre, through the adventure port; and the dungeon master's tools,
+which run a whole encounter against it — initiative, attacks, saving throws,
+damage, turns and the outcome — with the opponent's numbers hidden from the
+table. Until the agent runs on a model, a stand-in answers, and it calls no
+tools.
 
 ## Running it
 

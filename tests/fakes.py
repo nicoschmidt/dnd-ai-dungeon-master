@@ -71,6 +71,11 @@ class FixedDice:
             raise AssertionError(f"{value} cannot come from randint({a}, {b})")
         return value
 
+    def then(self, *values: int) -> "FixedDice":
+        """Queue more values, for a test that rolls step by step."""
+        self._values.extend(values)
+        return self
+
     @property
     def unused(self) -> list[int]:
         return list(self._values)

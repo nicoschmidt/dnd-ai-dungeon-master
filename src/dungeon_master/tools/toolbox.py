@@ -5,9 +5,12 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from ..adventure.repository import AdventureRepository
 from ..events.contract import EncounterUpdated, PartyUpdated, TableEvent
+from ..rules.dice import RandomSource
 from ..session.party import Character
 from ..session.state import SessionState
+from .context import ToolContext
 from .registry import TOOLS, ToolSpec
 from .result import ToolResult
 
@@ -20,15 +23,22 @@ class ToolBox:
     or the encounter differs afterwards, the matching state event is
     published. That is what makes ADR-0002's third commitment checkable: no
     number reaches the status panel except through here.
+
+    The opponent's state is deliberately not compared: it is hidden, so no
+    change to it can reach the table's stream from here.
     """
 
     def __init__(
         self,
         state: SessionState,
         publish: Callable[[TableEvent], object],
+        *,
+        adventure: AdventureRepository,
+        dice: RandomSource,
         tools: Iterable[ToolSpec] = TOOLS,
     ) -> None:
         self._state = state
+        self._context = ToolContext(state, adventure, dice)
         self._publish = publish
         self._tools = {tool.name: tool for tool in tools}
 
@@ -54,7 +64,7 @@ class ToolBox:
 
         party_before = self._party_snapshot()
         encounter_before = self._encounter_snapshot()
-        result = tool.handler(self._state, args)
+        result = tool.handler(self._context, args)
 
         # Published whatever the result, so the table never sees stale state
         # even if a handler changed something and then refused.

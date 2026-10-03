@@ -126,20 +126,20 @@ Pydantic models in `src/dungeon_master/tools/schemas.py`, and the list itself
 is `src/dungeon_master/tools/registry.py`. Every schema forbids arguments it
 does not name.
 
-| Tool | Arguments | Implemented |
-| --- | --- | --- |
-| `start_encounter` | `opponent_id` | refuses until #31 and #49 |
-| `record_initiative` | `character_id`, `total`, `dexterity_modifier` | refuses until #49 |
-| `resolve_player_attack` | `character_id`, `total`, `natural_roll` (1 or 20, optional) | refuses until #31 and #49 |
-| `opponent_saving_throw` | `ability`, `dc`, `mode` | refuses until #31 and #49 |
-| `opponent_attack` | `attack`, `target_id`, `mode` | refuses until #31 and #49 |
-| `apply_damage` | `target`, `amount`, `damage_type`, `halved_on_save`, `critical` | for characters; the opponent refuses until #31 and #49 |
-| `heal` | `character_id`, `amount` | yes |
-| `set_temporary_hit_points` | `character_id`, `amount` | yes |
-| `add_condition`, `remove_condition` | `target`, `condition` | for characters; the opponent refuses until #31 and #49 |
-| `end_turn` | — | refuses until #49 |
-| `end_encounter` | `outcome` | refuses until #49 |
-| `update_plan` | `plan` | refuses until #34 |
+| Tool | Arguments |
+| --- | --- |
+| `start_encounter` | `opponent_id` |
+| `record_initiative` | `character_id`, `total`, `dexterity_modifier` |
+| `resolve_player_attack` | `character_id`, `total`, `natural_roll` (1 or 20, optional) |
+| `opponent_saving_throw` | `ability`, `dc`, `mode` |
+| `opponent_attack` | `attack`, `target_id`, `mode` |
+| `apply_damage` | `target`, `amount`, `damage_type`, `halved_on_save`, `critical` |
+| `heal` | `character_id`, `amount` |
+| `set_temporary_hit_points` | `character_id`, `amount` |
+| `add_condition`, `remove_condition` | `target`, `condition` |
+| `end_turn` | — |
+| `end_encounter` | `outcome` |
+| `update_plan` | `plan` — refuses until #34 |
 
 `target` is a character's id or `opponent`. `mode` is `normal`, `advantage` or
 `disadvantage`. `damage_type`, `ability`, `condition` and `outcome` take the
@@ -150,6 +150,19 @@ arguments that do not fit the schema before any handler runs, and it compares
 the party and the encounter before and after the handler. When either differs,
 it publishes `party_updated` or `encounter_updated` with the new state. No
 tool declares what it changes, so none can forget to say so.
+
+**The opponent's state is hidden.** Its hit points, conditions, initiative and
+the attacks it has made this turn are session state the `ToolBox` does not
+compare, so no change to them produces an event on the table's stream. The
+table learns of the opponent from `encounter_updated` — its name and its place
+in the turn order — and from the narration. Results go to the model, which is
+the dungeon master and may know everything.
+
+**Every roll the code makes is in the result**, under `rolls`: purpose,
+expression, every die, the kept die, modifier, mode and total. The dice are
+the session's, seeded when it starts (`TableSession.seed`), so a session's
+opponent rolls can be reproduced. The journal (#33) records them; the table
+never sees them.
 
 **Handlers do no arithmetic.** They translate between the session's models and
 the rules core in `src/dungeon_master/rules/`, which decides everything

@@ -1,14 +1,19 @@
 """The tool surface: named, schema-checked, and heard by the table when it changes state."""
 
 import pytest
+from fakes import FixedDice
 
+from dungeon_master.adventure.repository import InMemoryAdventureRepository
 from dungeon_master.events.contract import EncounterUpdated, PartyUpdated
 from dungeon_master.session.party import Character
 from dungeon_master.session.state import Encounter, SessionState
 from dungeon_master.tools import schemas
+from dungeon_master.tools.context import ToolContext
 from dungeon_master.tools.registry import TOOLS, ToolSpec
 from dungeon_master.tools.result import ToolResult
 from dungeon_master.tools.toolbox import ToolBox
+
+NO_ADVENTURE = InMemoryAdventureRepository([])
 
 # docs/domain/combat.md, "The tools this implies", plus the plan of ADR-0006.
 NAMED_IN_THE_SPECIFICATION = {
@@ -52,7 +57,7 @@ def published() -> list:
 
 @pytest.fixture
 def toolbox(state: SessionState, published: list) -> ToolBox:
-    return ToolBox(state, published.append)
+    return ToolBox(state, published.append, adventure=NO_ADVENTURE, dice=FixedDice())
 
 
 def test_the_surface_is_the_one_the_specification_names() -> None:
@@ -127,25 +132,23 @@ def test_an_unknown_character_is_refused_with_the_known_ones(toolbox: ToolBox) -
     assert "brann" in result.reason
 
 
-def test_a_tool_not_yet_connected_refuses_and_names_its_issue(
+def test_a_tool_not_yet_implemented_refuses_and_names_its_issue(
     toolbox: ToolBox, published: list
 ) -> None:
-    result = toolbox.call("opponent_attack", {"attack": "Greatclub", "target_id": "brann"})
+    result = toolbox.call("update_plan", {"plan": "Let the ogre bargain first."})
 
     assert not result.ok
-    assert "#49" in result.reason
+    assert "#34" in result.reason
     assert published == []
 
 
-def test_damage_to_the_opponent_refuses_until_it_is_connected(
-    toolbox: ToolBox, published: list
-) -> None:
+def test_damage_to_the_opponent_needs_an_encounter(toolbox: ToolBox, published: list) -> None:
     result = toolbox.call(
         "apply_damage", {"target": "opponent", "amount": 7, "damage_type": "slashing"}
     )
 
     assert not result.ok
-    assert "#49" in result.reason
+    assert result.reason == "No encounter has started."
     assert published == []
 
 
@@ -245,14 +248,16 @@ def test_temporary_hit_points_keep_the_higher_value(
 def test_an_encounter_change_publishes_the_public_encounter(
     state: SessionState, published: list
 ) -> None:
-    def start(state: SessionState, args: schemas.StartEncounter) -> ToolResult:
-        state.encounter = Encounter(opponent_name="Ogre")
+    def start(context: ToolContext, args: schemas.StartEncounter) -> ToolResult:
+        context.state.encounter = Encounter(opponent_name="Ogre")
         return ToolResult.done()
 
     toolbox = ToolBox(
         state,
         published.append,
-        [ToolSpec("start_encounter", "test", schemas.StartEncounter, start)],
+        adventure=NO_ADVENTURE,
+        dice=FixedDice(),
+        tools=[ToolSpec("start_encounter", "test", schemas.StartEncounter, start)],
     )
 
     toolbox.call("start_encounter", {"opponent_id": "ogre"})
@@ -263,11 +268,17 @@ def test_an_encounter_change_publishes_the_public_encounter(
 def test_a_change_is_published_even_when_the_handler_then_refuses(
     state: SessionState, published: list
 ) -> None:
-    def half_done(state: SessionState, args: schemas.Heal) -> ToolResult:
-        state.party[0].current_hit_points = 20
+    def half_done(context: ToolContext, args: schemas.Heal) -> ToolResult:
+        context.state.party[0].current_hit_points = 20
         return ToolResult.refused("something else went wrong")
 
-    toolbox = ToolBox(state, published.append, [ToolSpec("heal", "test", schemas.Heal, half_done)])
+    toolbox = ToolBox(
+        state,
+        published.append,
+        adventure=NO_ADVENTURE,
+        dice=FixedDice(),
+        tools=[ToolSpec("heal", "test", schemas.Heal, half_done)],
+    )
 
     toolbox.call("heal", {"character_id": "brann", "amount": 1})
 
