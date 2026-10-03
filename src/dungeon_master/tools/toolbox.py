@@ -9,7 +9,7 @@ from ..adventure.repository import AdventureRepository
 from ..events.contract import EncounterUpdated, PartyUpdated, TableEvent
 from ..rules.dice import RandomSource
 from ..session.party import Character
-from ..session.state import SessionState
+from ..session.state import Encounter, SessionState
 from .context import ToolContext
 from .registry import TOOLS, ToolSpec
 from .result import ToolResult
@@ -49,6 +49,11 @@ class ToolBox:
     def party(self) -> list[Character]:
         """The party, to read. A copy: changes go through `call`."""
         return [c.model_copy(deep=True) for c in self._state.party]
+
+    def encounter(self) -> Encounter | None:
+        """The public encounter, to read. A copy: changes go through `call`."""
+        encounter = self._state.encounter
+        return encounter.model_copy(deep=True) if encounter else None
 
     def call(self, name: str, arguments: Mapping[str, Any]) -> ToolResult:
         tool = self._tools.get(name)

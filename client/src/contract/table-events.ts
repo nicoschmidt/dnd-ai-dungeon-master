@@ -176,7 +176,7 @@ export interface Combatant {
  */
 export interface TableError {
   type: 'error'
-  code: 'agent_failed'
+  code: 'agent_failed' | 'authentication_failed' | 'credential_mismatch' | 'usage_limit_reached'
   message: string
   turn_id: string | null
 }

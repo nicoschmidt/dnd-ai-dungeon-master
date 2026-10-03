@@ -6,7 +6,6 @@ and proxies `/api` here, so a missing client build is not an error.
 """
 
 import logging
-import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -15,15 +14,18 @@ from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from ..adventure.builtin import iteration_001_repository
 from ..adventure.repository import AdventureRepository
 from ..orchestration.agent import DungeonMaster
+from ..orchestration.agent_sdk import AgentSdkDungeonMaster
+from ..orchestration.credentials import CredentialSwitch
 from ..orchestration.session import TableSession
 from ..orchestration.stand_in import StandInDungeonMaster
+from ..settings import Settings
 from . import session
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CLIENT_DIST = Path("client") / "dist"
 
 
 class Health(BaseModel):
@@ -42,18 +44,31 @@ def create_app(
     client_dist: Path | None = None,
     dungeon_master: DungeonMaster | None = None,
     adventure: AdventureRepository | None = None,
+    *,
+    settings: Settings | None = None,
+    credentials: CredentialSwitch | None = None,
 ) -> FastAPI:
     """Build the application, with one session for the one table.
 
-    `client_dist` is the directory of the built client. It defaults to
-    `DM_CLIENT_DIST` from the environment, else `client/dist` relative to the
-    working directory. `dungeon_master` defaults to the stand-in until the
-    agent runs on a model (#32); `adventure` to iteration 001's built-in fight.
+    Configuration comes from `Settings`: `DM_` environment variables or `.env`.
+    `client_dist` is the directory of the built client, `DM_CLIENT_DIST` unless
+    given. The dungeon master is the Claude agent, or the stand-in with
+    `DM_DUNGEON_MASTER=stand_in`; tests pass their own. `adventure` defaults to
+    iteration 001's built-in fight. `credentials` is the one switch the API
+    and the dungeon master share; pass it with a dungeon master that uses it.
     """
-    if client_dist is None:
-        client_dist = Path(os.environ.get("DM_CLIENT_DIST", DEFAULT_CLIENT_DIST))
+    settings = settings or Settings()
+    client_dist = client_dist or settings.client_dist
+    adventure = adventure or iteration_001_repository()
+    credentials = credentials or CredentialSwitch(settings)
+    if dungeon_master is None:
+        dungeon_master = (
+            AgentSdkDungeonMaster(settings, credentials, adventure)
+            if settings.dungeon_master == "agent"
+            else StandInDungeonMaster()
+        )
 
-    table = TableSession(dungeon_master or StandInDungeonMaster(), adventure=adventure)
+    table = TableSession(dungeon_master, adventure=adventure, redact=credentials.redact)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -65,6 +80,7 @@ def create_app(
 
     app = FastAPI(title="AI Dungeon Master", lifespan=lifespan)
     app.state.session = table
+    app.state.credentials = credentials
     app.include_router(router)
     app.include_router(session.router)
 

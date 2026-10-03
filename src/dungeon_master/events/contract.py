@@ -91,7 +91,12 @@ class EncounterUpdated(_Model):
     encounter: Encounter | None
 
 
-ErrorCode = Literal["agent_failed"]
+ErrorCode = Literal[
+    "agent_failed",
+    "authentication_failed",
+    "credential_mismatch",
+    "usage_limit_reached",
+]
 
 
 class TableError(_Model):
