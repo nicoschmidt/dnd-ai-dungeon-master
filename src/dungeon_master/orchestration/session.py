@@ -2,6 +2,7 @@
 
 import random
 import secrets
+from collections.abc import Callable
 
 from ..adventure.builtin import iteration_001_repository
 from ..adventure.repository import AdventureRepository
@@ -37,6 +38,7 @@ class TableSession:
         *,
         adventure: AdventureRepository | None = None,
         seed: int | None = None,
+        redact: Callable[[str], str] = lambda text: text,
     ) -> None:
         self.seed = secrets.randbits(64) if seed is None else seed
         self.state = SessionState()
@@ -47,7 +49,7 @@ class TableSession:
             adventure=adventure or iteration_001_repository(),
             dice=random.Random(self.seed),
         )
-        self.turns = TurnRunner(dungeon_master, self.tools, self.events.publish)
+        self.turns = TurnRunner(dungeon_master, self.tools, self.events.publish, redact)
 
     def enter_party(self, entry: PartyEntry) -> list[Character]:
         """Replace the party with what the group typed in, until the encounter starts.

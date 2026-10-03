@@ -12,6 +12,9 @@ dependencies = [
     # The table's stream uses fastapi.sse; 0.141 is the oldest version tested.
     "fastapi>=0.141",
     "pydantic>=2.11",
+    "pydantic-settings>=2.15",
+    # Runs the dungeon master; bundles the Claude Code CLI it drives.
+    "claude-agent-sdk>=0.2.163",
     "uvicorn[standard]",
 ]
 

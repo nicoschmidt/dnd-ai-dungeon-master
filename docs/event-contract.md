@@ -91,8 +91,19 @@ the turn order as a list of combatants, the index of whoever acts now, and the
 outcome once it has ended. The opponent's armour class and hit points are not
 in it.
 
-**Error codes** so far: `agent_failed` — the dungeon master could not finish
-the turn; the action can be declared again. #32 adds the credential errors.
+**Error codes:**
+
+| Code | Meaning |
+| --- | --- |
+| `agent_failed` | The dungeon master could not finish the turn; the action can be declared again. |
+| `authentication_failed` | Claude Code is not logged in (subscription), or the API key was rejected. The message says which, and what to do. |
+| `credential_mismatch` | The CLI reported a different credential than the chosen mode, so the turn was stopped before anything reached the model ([ADR-0007](adr/0007-model-credentials.md)). |
+| `usage_limit_reached` | The subscription's usage limit — the message names the switch to the API key — or the API key's rate limit. |
+
+The credential mode itself is not on the table's stream. It is read and
+switched through `GET` / `PUT /api/session/credentials` (`{"mode":
+"subscription" | "api_key"}`), which answer with the mode and whether a key is
+configured — never the key. A switch takes effect at the next turn.
 
 ## The declared action
 

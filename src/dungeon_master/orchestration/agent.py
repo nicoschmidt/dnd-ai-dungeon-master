@@ -9,8 +9,22 @@ stand-in.
 from collections.abc import AsyncIterator
 from typing import Protocol
 
-from ..events.contract import DeclaredAction
+from ..events.contract import DeclaredAction, ErrorCode
 from ..tools.toolbox import ToolBox
+
+
+class DungeonMasterError(Exception):
+    """A turn failed for a reason the table should be told about.
+
+    `message` is written for the table and must never carry a credential; the
+    turn runner publishes it as it is. Any other exception becomes the generic
+    `agent_failed`.
+    """
+
+    def __init__(self, code: ErrorCode, message: str) -> None:
+        super().__init__(message)
+        self.code: ErrorCode = code
+        self.message = message
 
 
 class DungeonMaster(Protocol):

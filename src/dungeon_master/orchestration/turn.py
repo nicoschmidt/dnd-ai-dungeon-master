@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import traceback
 from collections.abc import Callable
 from uuid import uuid4
 
@@ -14,7 +15,7 @@ from ..events.contract import (
     TurnStarted,
 )
 from ..tools.toolbox import ToolBox
-from .agent import DungeonMaster
+from .agent import DungeonMaster, DungeonMasterError
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +40,12 @@ class TurnRunner:
         dungeon_master: DungeonMaster,
         tools: ToolBox,
         publish: Callable[[TableEvent], object],
+        redact: Callable[[str], str] = lambda text: text,
     ) -> None:
         self._dungeon_master = dungeon_master
         self._tools = tools
         self._publish = publish
+        self._redact = redact
         self._task: asyncio.Task[None] | None = None
 
     @property
@@ -76,9 +79,13 @@ class TurnRunner:
             async for text in self._dungeon_master.take_turn(action, self._tools):
                 if text:
                     self._publish(NarrationDelta(turn_id=turn_id, text=text))
+        except DungeonMasterError as error:
+            logger.warning("turn %s failed: %s", turn_id, self._redact(error.message))
+            self._publish(TableError(code=error.code, message=error.message, turn_id=turn_id))
         except Exception:
-            # The exception's text stays in the log: it may carry a credential.
-            logger.exception("turn %s failed", turn_id)
+            # The exception's text stays in the log, never in the event, and
+            # passes through redaction first: it may carry a credential.
+            logger.error("turn %s failed:\n%s", turn_id, self._redact(traceback.format_exc()))
             self._publish(
                 TableError(code="agent_failed", message=AGENT_FAILED_MESSAGE, turn_id=turn_id)
             )
