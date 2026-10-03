@@ -380,7 +380,12 @@
           "type": "string"
         },
         "code": {
-          "const": "agent_failed",
+          "enum": [
+            "agent_failed",
+            "authentication_failed",
+            "credential_mismatch",
+            "usage_limit_reached"
+          ],
           "type": "string"
         },
         "message": {

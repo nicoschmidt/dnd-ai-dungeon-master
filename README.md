@@ -16,8 +16,8 @@ character preselected; the rules of combat in deterministic code; an opponent,
 the SRD's Ogre, through the adventure port; and the dungeon master's tools,
 which run a whole encounter against it — initiative, attacks, saving throws,
 damage, turns and the outcome — with the opponent's numbers hidden from the
-table. Until the agent runs on a model, a stand-in answers, and it calls no
-tools.
+table. The dungeon master is a Claude agent, on your own Claude subscription
+or on an API key.
 
 ## Running it
 
@@ -31,6 +31,30 @@ python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 (cd client && npm ci && npm run build)
 ```
+
+**The dungeon master's credential** ([ADR-0007](docs/adr/0007-model-credentials.md)).
+Configuration comes from `DM_` environment variables or a `.env` file in the
+repository root, which is never committed; `cp .env.example .env` gives you
+every variable with an explanation.
+
+- **On your Claude subscription** (the default): log in once with Claude Code
+  itself — `claude /login`, or `claude setup-token` for a long-lived token you
+  export as `CLAUDE_CODE_OAUTH_TOKEN`. The application never reads that
+  credential, and an `ANTHROPIC_API_KEY` in your shell is switched off for the
+  dungeon master, so it cannot silently outrank the login.
+- **On an API key**: create one in the Claude Console and set
+  `DM_ANTHROPIC_API_KEY` in `.env`. Start in that mode with
+  `DM_CREDENTIAL_MODE=api_key`, or switch between turns:
+
+  ```bash
+  curl -X PUT http://127.0.0.1:8000/api/session/credentials \
+    -H 'content-type: application/json' -d '{"mode": "api_key"}'
+  ```
+
+Each turn checks which credential the CLI actually reports and stops if it is
+not the chosen one. `DM_MODEL` picks the model (default `claude-opus-5`).
+Without any credential, `DM_DUNGEON_MASTER=stand_in` runs a stand-in that only
+echoes what you declare.
 
 **At the table**, one process serves everything:
 
@@ -70,8 +94,8 @@ curl -X POST http://127.0.0.1:8000/api/session/actions \
   -H 'content-type: application/json' -d '{"text": "I attack the ogre, 17"}'
 ```
 
-Until the dungeon master runs on a model (#32), a stand-in answers every
-action by echoing it, word by word.
+With `DM_DUNGEON_MASTER=stand_in`, the stand-in answers every action by
+echoing it, word by word — useful for working on the stream without a model.
 
 **Tests:**
 
