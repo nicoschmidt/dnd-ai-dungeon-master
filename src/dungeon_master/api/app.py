@@ -15,6 +15,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from ..adventure.repository import AdventureRepository
 from ..orchestration.agent import DungeonMaster
 from ..orchestration.session import TableSession
 from ..orchestration.stand_in import StandInDungeonMaster
@@ -38,19 +39,21 @@ def health() -> Health:
 
 
 def create_app(
-    client_dist: Path | None = None, dungeon_master: DungeonMaster | None = None
+    client_dist: Path | None = None,
+    dungeon_master: DungeonMaster | None = None,
+    adventure: AdventureRepository | None = None,
 ) -> FastAPI:
     """Build the application, with one session for the one table.
 
     `client_dist` is the directory of the built client. It defaults to
     `DM_CLIENT_DIST` from the environment, else `client/dist` relative to the
     working directory. `dungeon_master` defaults to the stand-in until the
-    agent runs on a model (#32).
+    agent runs on a model (#32); `adventure` to iteration 001's built-in fight.
     """
     if client_dist is None:
         client_dist = Path(os.environ.get("DM_CLIENT_DIST", DEFAULT_CLIENT_DIST))
 
-    table = TableSession(dungeon_master or StandInDungeonMaster())
+    table = TableSession(dungeon_master or StandInDungeonMaster(), adventure=adventure)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:

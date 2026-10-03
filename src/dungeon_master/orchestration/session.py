@@ -1,5 +1,10 @@
 """One session at the table: its state, its event log, its tools and its turns."""
 
+import random
+import secrets
+
+from ..adventure.builtin import iteration_001_repository
+from ..adventure.repository import AdventureRepository
 from ..events.contract import DeclaredAction, PartyUpdated
 from ..events.log import EventLog
 from ..session.party import Character, PartyEntry, build_party
@@ -18,10 +23,30 @@ class UnknownCharacter(Exception):
 
 
 class TableSession:
-    def __init__(self, dungeon_master: DungeonMaster) -> None:
+    """One table's session.
+
+    `seed` seeds the dice the code rolls for the opponent, so a session's rolls
+    can be reproduced; it is drawn at random unless given, and readable for
+    the journal (#33). `adventure` is where opponents come from: iteration
+    001's built-in fight unless another is given.
+    """
+
+    def __init__(
+        self,
+        dungeon_master: DungeonMaster,
+        *,
+        adventure: AdventureRepository | None = None,
+        seed: int | None = None,
+    ) -> None:
+        self.seed = secrets.randbits(64) if seed is None else seed
         self.state = SessionState()
         self.events = EventLog()
-        self.tools = ToolBox(self.state, self.events.publish)
+        self.tools = ToolBox(
+            self.state,
+            self.events.publish,
+            adventure=adventure or iteration_001_repository(),
+            dice=random.Random(self.seed),
+        )
         self.turns = TurnRunner(dungeon_master, self.tools, self.events.publish)
 
     def enter_party(self, entry: PartyEntry) -> list[Character]:

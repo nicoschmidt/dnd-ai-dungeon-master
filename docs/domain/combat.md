@@ -68,6 +68,10 @@ The encounter is started with the opponent's identity. The model narrates the
 premise and asks every player for **initiative**: a d20 plus their Dexterity
 modifier, rolled and added at the table.
 
+An encounter needs a party: the code refuses to start one before the
+characters are entered. It also refuses to start a second while one is
+running; an encounter that has ended can be followed by a new one.
+
 ### 2. Initiative
 
 Each reported total is recorded, together with the Dexterity modifier the
@@ -88,6 +92,9 @@ opponent by the rule above: those whose modifier is at least the opponent's go
 before it, the others after it, and each of those two groups keeps the order
 the players reported. That can put a later-reported character first; the
 pairwise rule against the opponent wins over the reporting order.
+
+A total can be recorded again, to correct it, until the order is fixed; after
+that the order stands for the encounter.
 
 The order and the current round are public. The opponent's initiative total is
 not.
@@ -151,7 +158,9 @@ outcome from the narration and from the status panel, not from a dice record.
 
 A multiattack is the model calling the attack tool once per attack. The
 opponent's stat block declares how many attacks it has; the code refuses more
-than that in one turn.
+than that in one turn. For that count to mean anything, the code accepts the
+opponent's attacks only on the opponent's turn — there are no reactions in
+iteration 001 — and gives them back when the turn passes.
 
 ### 5. End
 

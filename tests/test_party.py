@@ -72,6 +72,12 @@ def test_names_that_fold_to_the_same_id_get_distinct_ids() -> None:
     assert ids == ["jorg", "jorg-2"]
 
 
+def test_no_character_takes_the_id_the_tools_use_for_the_opponent() -> None:
+    [character] = build_party(party(entry("Opponent")), [])
+
+    assert character.id == "opponent-2"
+
+
 def test_a_character_entered_again_keeps_its_conditions() -> None:
     before = build_party(party(entry()), [])
     before[0].conditions = ["poisoned"]
