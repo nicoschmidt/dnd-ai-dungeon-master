@@ -22,9 +22,13 @@ or on an API key.
 ## Running it
 
 Needs Python 3.12 or newer and Node.js. All commands run from the repository
-root unless they say otherwise.
+root unless they say otherwise — the backend reads `.env` from the directory
+it is started in.
 
-Once, and again after dependencies change:
+What runs where, and what happens between declaring an action and reading the
+narration, is in [docs/runtime.md](docs/runtime.md), with diagrams.
+
+### Once, and again after dependencies change
 
 ```bash
 python3 -m venv .venv
@@ -32,10 +36,23 @@ python3 -m venv .venv
 (cd client && npm ci && npm run build)
 ```
 
-**The dungeon master's credential** ([ADR-0007](docs/adr/0007-model-credentials.md)).
-Configuration comes from `DM_` environment variables or a `.env` file in the
-repository root, which is never committed; `cp .env.example .env` gives you
-every variable with an explanation.
+- `python3 -m venv .venv` creates a Python environment of the project's own in
+  `.venv`, so nothing is installed into the system's Python.
+- `pip install -e '.[dev]'` installs the backend *editable*: Python imports it
+  straight from `src/`, so a code change needs no reinstall. `[dev]` adds the
+  test tools. This also installs the Claude Agent SDK, which brings its own
+  copy of the Claude Code CLI.
+- `npm ci` installs the client's dependencies exactly as `package-lock.json`
+  pins them; `npm run build` type-checks the client and bundles it into
+  `client/dist`, which is what the backend serves at the table.
+
+### The dungeon master's credential
+
+See [ADR-0007](docs/adr/0007-model-credentials.md). Configuration comes from
+`DM_` environment variables or a `.env` file in the repository root, which is
+never committed; `cp .env.example .env` gives you every variable with an
+explanation. The backend reads it once, when it starts: after changing `.env`,
+restart it.
 
 - **On your Claude subscription** (the default): log in once with Claude Code
   itself — `claude /login`, or `claude setup-token` for a long-lived token you
@@ -56,32 +73,61 @@ not the chosen one. `DM_MODEL` picks the model (default `claude-opus-5`).
 Without any credential, `DM_DUNGEON_MASTER=stand_in` runs a stand-in that only
 echoes what you declare.
 
-**At the table**, one process serves everything:
+### At the table: one process
 
 ```bash
 .venv/bin/uvicorn dungeon_master.api.app:app --timeout-graceful-shutdown 1
 ```
 
-Then open <http://127.0.0.1:8000>. The backend serves the client from
-`client/dist`; set `DM_CLIENT_DIST` to serve a build from elsewhere. Without a
-build it serves the API only and says so in its log.
+Then open <http://127.0.0.1:8000>.
 
-The timeout matters: the table's event stream stays open as long as a browser
-shows the page, and without it uvicorn waits for that browser before it stops.
+- `uvicorn` is the web server. `dungeon_master.api.app:app` names the module
+  to import and the application object in it; importing the module builds the
+  whole backend — configuration, credential, opponent, dungeon master and the
+  table's session.
+- It listens on `127.0.0.1:8000`, so only this machine can reach it. The API
+  has no authentication; do not open it to a network you do not trust.
+- It serves the API under `/api` and the built client from `client/dist` (or
+  `DM_CLIENT_DIST`) at `/`. Without a build it serves the API only and says so
+  in its log. After changing the client, run `npm run build` again.
+- `--timeout-graceful-shutdown 1`: the table's event stream stays open as long
+  as a browser shows the page, and without the timeout uvicorn waits for that
+  browser before it stops. With it, `Ctrl+C` stops the server after a second;
+  the error it logs about a cancelled request is that open stream, and
+  harmless.
+- The session lives in this process's memory. Stopping it ends the session:
+  the next start begins with an empty party.
 
-**While developing**, run the backend and the Vite dev server side by side,
-and open <http://localhost:5173>. Vite proxies `/api` to the backend.
+### While developing: two processes
+
+In one terminal, the backend:
 
 ```bash
 .venv/bin/uvicorn dungeon_master.api.app:app --reload --timeout-graceful-shutdown 1
 ```
 
+In another, the client:
+
 ```bash
 cd client && npm run dev
 ```
 
-**Watching the stream.** `curl -N` shows exactly the events the page receives
-(see [the event contract](docs/event-contract.md)). In one shell:
+Then open <http://localhost:5173>, not port 8000.
+
+- The Vite dev server (`npm run dev`) serves the client from its source and
+  updates the page the moment a client file changes, usually without a reload.
+  Every request to `/api` it passes on to the backend on port 8000, so the
+  page behaves as it does at the table.
+- `--reload` makes uvicorn restart the backend whenever a Python file changes.
+  A restart is a new, empty session. The page reconnects on its own, but keeps
+  showing the old session until the new one's first event arrives: reload the
+  page after a restart. Changes to `.env` are not watched; restart by hand.
+- The build in `client/dist` plays no part here, and need not be current.
+
+### Watching what happens
+
+`curl -N` shows exactly the events the page receives (see
+[the event contract](docs/event-contract.md)). In one shell:
 
 ```bash
 curl -N http://127.0.0.1:8000/api/session/stream
@@ -94,15 +140,20 @@ curl -X POST http://127.0.0.1:8000/api/session/actions \
   -H 'content-type: application/json' -d '{"text": "I attack the ogre, 17"}'
 ```
 
-With `DM_DUNGEON_MASTER=stand_in`, the stand-in answers every action by
-echoing it, word by word — useful for working on the stream without a model.
+What the model was told and answered, every tool call and its result, and the
+cost are in Claude Code's session transcripts; where they are and how to read
+them is in [docs/runtime.md](docs/runtime.md#where-to-look). With
+`DM_DUNGEON_MASTER=stand_in`, the stand-in answers every action by echoing it,
+word by word — useful for working on the stream without a model.
 
-**Tests:**
+### Tests
 
 ```bash
 .venv/bin/pytest
 (cd client && npm test && npm run lint && npm run build)
 ```
+
+No test calls a model; they need no credential.
 
 **After changing the event contract** in `src/dungeon_master/events/`,
 regenerate the schema and the client's types, and commit both:
@@ -141,6 +192,8 @@ backend in `tests/`.
 - [Architecture](docs/architecture.md)
 - [The table's event contract](docs/event-contract.md) — what the shared
   screen receives, and what it sends
+- [What happens when it runs](docs/runtime.md) — processes, the flow of one
+  declared action, and where to look when debugging
 - [Decision records](docs/adr/README.md)
 - [Process](docs/process.md) — how work moves from issue to merge
 - [Working agreements for AI assistants](CLAUDE.md)
