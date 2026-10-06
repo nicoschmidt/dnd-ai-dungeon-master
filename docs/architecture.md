@@ -3,6 +3,10 @@
 > This document is derived from the accepted decision records in
 > `docs/adr/`. It is updated in the same commit that accepts an ADR.
 > If the two disagree, the ADRs are authoritative.
+>
+> How these components talk to each other at run time — the processes, one
+> declared action step by step, and where to look when debugging — is in
+> [runtime.md](runtime.md), which follows the code rather than the ADRs.
 
 ## Shape
 
