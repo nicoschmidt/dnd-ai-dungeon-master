@@ -28,4 +28,4 @@ body:
     id: context
     attributes:
       label: Environment and context
-      description: Version or commit, adventure in play, session state if relevant. Do not paste copyrighted adventure text.
+      description: Version or commit, relevant state. Mind the hard rules in CLAUDE.md about what may not be pasted here.

@@ -1,6 +1,8 @@
 # Iterations
 
-One file per iteration, named `NNN-<short-goal>.md`.
+One file per iteration, named `NNN-<short-goal>.md`, copied from
+[TEMPLATE.md](TEMPLATE.md). The rules are in
+`.claude/rules/process/iterations.md`.
 
 Each iteration states:
 
@@ -8,8 +10,13 @@ Each iteration states:
   before?
 - **Scope** — the issues pulled in, by number.
 - **Out of scope** — what was deliberately deferred, and why.
-- **Result** — filled in at the end: what shipped, what did not, what we
-  learned.
+- **Result** — filled in at the end: what shipped, what did not.
+- **Process learnings** — the retro, from the `process` issues, the reviews
+  and the cuts; each marked `[project]` or `[generic]`.
+
+Iteration files written before ai-dev-process was adopted keep their
+structure, and gain a **Process learnings** section when their retro is
+written.
 
 Iterations are tracked on the GitHub Project board via the `Iteration`
 field. This folder holds the narrative that the board cannot.

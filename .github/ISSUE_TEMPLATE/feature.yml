@@ -7,7 +7,7 @@ body:
     attributes:
       label: What and for whom
       description: One or two sentences. Who benefits, and what can they do afterwards that they cannot do now?
-      placeholder: As a player at the table, I can ... so that ...
+      placeholder: As a <user>, I can ... so that ...
     validations:
       required: true
   - type: textarea

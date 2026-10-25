@@ -1,168 +1,138 @@
+<!-- Managed by ai-dev-process. Do not edit in a project: change it upstream, or record a deviation in CLAUDE.md. -->
+
 # Process
 
 How work moves through this project, written for the maintainer.
 
-`CLAUDE.md` holds the rules and is binding. This document is the walkthrough:
-what to do next, and where to click. It links to the rules rather than
-repeating them. **Where the two disagree, `CLAUDE.md` wins** — and that is a
-defect to fix, not a choice to make.
+The rules are in `.claude/rules/process/` and in `CLAUDE.md`, and they are
+binding. This document is the walkthrough: what to do next, and where to
+click. **Where the two disagree, the rules win** — and that is a defect to
+fix, not a choice to make.
 
 ## Where am I?
 
 | What the maintainer wants | What to do next |
 | --- | --- |
-| Start something new | Is there an issue? If not, write one. Then set it to `Ready` and create a branch. |
-| An idea, but not now | Issue in `Backlog`. Do not create a branch. |
-| Work was prepared in a Cowork session | Read the local branch diff, push it, open the pull request. |
+| Something came to mind, no time now | Capture it as an `idea` issue — see [Capture](#capture). Seconds, not minutes. |
+| The inbox is filling up | A refinement session: `/ai-dev-process:refine-backlog` |
+| Start something new | Is there a ready issue? If not, refine one. Then set it to `Ready`; the assistant creates the branch. |
+| Work was prepared in a chat session | Read the local branch diff, push it, open the pull request. |
 | A pull request is open | Review it, tick the definition of done, merge. |
-| A pull request was merged | Run the cleanup block in step 8 below, card to `Done`. |
-| A decision that is hard to reverse | Write the ADR **before** the code. See `docs/adr/README.md`. |
-| An iteration goal is playable | Write the retro note in `docs/iterations/`, close the epic. |
-| Something feels too big | Set its size to `L`. It must be cut before it enters an iteration. |
-| Maintainer has lost the thread | Open the project board, filter `Status: In progress`. That is what is actually started. |
+| A pull request was merged | Run the cleanup block in step 8 below; card to `Done`. |
+| A decision that is hard to reverse | Write the ADR **before** the code: `/ai-dev-process:write-adr` |
+| An iteration goal is reached | Retro: `/ai-dev-process:close-iteration` |
+| Something feels too big | Set its size to `L`. It is cut before it enters an iteration. |
+| The process itself gets in the way | Capture a `process` idea. The retro will find it. |
+| Lost the thread | Open the board, filter `Status: In progress`. That is what is actually started. |
+
+## Capture
+
+An idea is captured where it occurs, in whichever way is nearest:
+
+- **Phone or browser:** New issue → **Idea**. The title is enough.
+- **Terminal:**
+  `bash scripts/process/capture-idea.sh "<title>"` — add `--process` for the
+  way of working.
+- **A chat session:** say "Idee: …". The assistant writes the title and a
+  prefilled link to the Idea form; one tap submits it.
+- **Claude Code:** say "capture: …". It creates the issue directly — the one
+  GitHub step it may take itself.
+
+Ideas are never worked on as they are. Ideas about the process stay in this
+repository with the `process` label until the retro decides whether they are
+`[project]` or `[generic]`.
+
+## Refinement
+
+A refinement session empties the inbox. For each open `idea` issue:
+
+- **close** it as not planned, with one line why — most ideas deserve this,
+  and that is fine
+- **merge** it into an existing issue, and close it as a duplicate
+- **transfer** it to the process repository when it is clearly generic
+- **refine** it: rewrite it to a template, checkable acceptance criteria, size
+  and iteration — until it meets the definition of ready in
+  `.claude/rules/process/workflow.md`
+
+Every outcome is handed over as one block to paste. `Ready` stays a click.
 
 ## What the maintainer gets handed, and what they do
 
-The maintainer owns every step that reaches GitHub. They do not have to compose any of them.
+The maintainer owns every step that reaches GitHub, and composes none of them.
+For each step the assistant hands over the finished artefact and the command:
+the issue text, the pull request body, the exact `git`/`gh` invocation with
+real numbers and paths. Size and iteration arrive set; status does not.
 
-For each manual step the assistant hands over the finished artefact and the
-command to run it: the issue text, the pull request body, the exact
-`git`/`gh` invocation with real numbers and paths filled in. Board fields
-count as part of that: a new issue arrives with its size and iteration already
-set by `gh project item-edit`, because both are facts about the work. Status
-is not set for the maintainer — it is a judgement about whether the work is
-ready, in review or done.
+Drafted bodies live beside the repository (`../pr-<n>-body.md`,
+`../create-*.sh`) and are never committed. The tooling they use lives under
+`scripts/process/`.
 
-Drafted bodies are written beside the repository (`../pr-<n>-body.md`,
-`../create-*.sh`) and never committed — inside it they would be a second task
-list. The tooling those blocks use is the opposite case and lives in the
-repository under `scripts/`, where it is reviewed and versioned along with the
-rules it implements.
-
-So the maintainer's part is: read it, judge it, paste it. If a command arrives with a
-placeholder still in it, or a step arrives as an instruction rather than a
-command, that is a defect — say so.
-
-The one thing the assistant does itself is creating the local branch, because
-it cannot commit without one. Nothing has reached GitHub at that point; the
-push is the gate, not the branch.
+So the maintainer's part is: read it, judge it, paste it. A command with a
+placeholder still in it, or a step that arrives as an instruction rather than
+a command, is a defect — say so.
 
 ## The standard cycle
 
-1. **Issue.** Use a template: feature, bug or spike. Acceptance criteria are
-   statements that can be checked, not intentions.
-   → *Handed over:* the issue body and a ready block that creates the issue,
-   puts it on the board and sets its size and iteration. The type field comes
-   from the label. The maintainer reads the body and pastes the block.
-
-   The block calls the helpers in `scripts/`, and needs the `project` scope,
-   which `gh auth login` does not grant by default:
-
-   ```bash
-   gh auth refresh -s project
-   ```
-
-2. **`Ready`.** The criteria are clear enough that work could start today.
-   → *The maintainer's click on the board.* Nothing to paste, and deliberately
-   so: status is the one board field that is a judgement rather than a fact.
-3. **Branch.** `<type>/<issue>-<slug>` with `feat`, `fix`, `docs` or `chore`,
-   for example `chore/5-adventure-content-check`.
-   Usually created by the assistant so it can commit; never work on `main`.
-   → *Nothing to do.* The branch name is reported; it stays local until step 5.
-4. **Work.** Cowork for product and architecture questions; Claude Code for
-   work against existing code. Rule of thumb: if answering needs the
-   codebase, it belongs in Claude Code.
-5. **`In review`.** Push the branch, open the pull request in the repository
-   view (Code tab → "Compare & pull request"), put `Closes #<n>` in the body.
-   → *Handed over:* the pull request body as `../pr-<n>-body.md`, plus
-   `git push` and `gh pr create --body-file …` with the values filled in. The
-   maintainer reads the body first — it is what reviewers see — then runs both.
-6. **Review.** Tick the template's checklist for real. Line-level changes are
-   easiest as review suggestions; questions about the goal belong on the
-   issue; open-ended "is this even right" belongs in a Cowork session.
-   → *The maintainer's alone.* Nothing is handed over here, by design.
-7. **Merge.** The maintainer merges. The assistant never merges its own pull request.
-   → *The maintainer's alone.*
-8. **After.** Clean up and move the card to `Done` (automatic if the "Item
-   closed" workflow is enabled).
-   → *Handed over:* this block, with `<branch>` already substituted.
+1. **Issue.** From refinement, or written directly from a template: feature,
+   bug or spike.
+   → *Handed over:* the body and a block that creates the issue and sets size
+   and iteration. Needs the `project` scope once: `gh auth refresh -s project`
+2. **`Ready`.** → *The maintainer's click.*
+3. **Branch.** `<type>/<issue>-<slug>`, created by the assistant so it can
+   commit. → *Nothing to do;* the branch stays local until step 5.
+4. **Work.** Chat for product and architecture; Claude Code against the code.
+5. **`In review`.** → *Handed over:* `../pr-<n>-body.md`, plus `git push` and
+   `gh pr create --body-file …` with the values filled in. Read the body first.
+6. **Review.** Tick the checklist for real. Line-level changes as review
+   suggestions; questions about the goal on the issue; "is this even right" in
+   a chat session. → *The maintainer's alone.*
+7. **Merge.** → *The maintainer's alone.* The assistant never merges.
+8. **After.** → *Handed over,* with the branch name filled in:
 
    ```bash
-   git checkout main && git pull
+   git switch main && git pull
    git branch -d <branch>                  # local
    git push origin --delete <branch>       # remote, if it still exists
-   git fetch --prune                       # drop stale tracking refs
+   git fetch --prune
    ```
 
-   Enabling **Settings → General → "Automatically delete head branches"**
-   makes the remote half of this unnecessary from then on.
-
-## Who can do what
-
-|  | Cowork | Claude Code | Maintainer |
-| --- | --- | --- | --- |
-| Read the repository | yes | yes | yes |
-| Commit on a branch | yes | yes | yes |
-| Push | **no — no credentials** | yes | yes |
-| Open issues and pull requests | no | yes, via `gh` | yes |
-| Merge | never | never | only maintainer |
-
-A commit made in a Cowork session is not delivered until the maintainer pushes it.
-That missing credential is the review gate, not an inconvenience to work around.
-
-Cowork can read a single issue or pull request by URL, but not GitHub's list
-and search pages. Paste the direct link.
+   `gh repo edit --delete-branch-on-merge` makes the remote half unnecessary.
 
 ## When something goes wrong
 
 **Branch has fallen behind `main`**
 
 ```bash
-git checkout main && git pull
-git checkout <branch> && git rebase main
+git switch main && git pull
+git switch <branch> && git rebase main
 ```
 
-**The maintainer committed on `main` by accident** — do not push. Rescue the work onto a branch and reset:
+**Committed on `main` by accident** — do not push. The pre-commit hook should
+have stopped it; check `git config core.hooksPath` says `.githooks`. Then:
 
 ```bash
 git branch <rescue-branch>          # keeps the commits
 git reset --hard origin/main        # main back to the remote state
-git checkout <rescue-branch>
+git switch <rescue-branch>
 ```
 
 **Two pieces of work want the same file.** Put them on one branch and say so
-in the pull request, or finish the first and rebase the second. Parallel
-branches touching the same file are a conflict the maintainer schedules for themselves.
+in the pull request, or finish the first and rebase the second.
 
 **An iteration keeps growing.** Cut the goal, move the remainder to issues.
-Iterations here are bounded by scope, not time, so nothing else stops the
-growth.
 
-**The maintainer notices a decision was made without an ADR.** Stop, write it, then
-continue. An ADR written afterwards is worth much less, because the options
-not taken are already forgotten.
+**A decision was made without an ADR.** Stop, write it, then continue.
 
 **A handover script says a field or an option does not exist.** The board is
-the authority and the script is not. Print what the board actually has, then
-fix the script:
+the authority:
 
 ```bash
-bash scripts/show-board.sh
+bash scripts/process/show-board.sh
 ```
 
-**An adventure file has landed in this repository.** Remove it before the
-commit is pushed. If it was already pushed, the history has to be rewritten —
-and that is a genuinely bad afternoon, which is why the rule exists.
+**CI says a managed file changed.** It was edited here. Restore it, and put
+the change where it belongs — upstream, or as a deviation in `CLAUDE.md`:
 
-## Conventions at a glance
-
-- **Task list:** GitHub issues only. No markdown backlogs, no TODO files.
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
-  `chore:`). The message carries the reasoning; discussion in a chat window
-  does not survive.
-- **CI:** the `main` ruleset requires one check, `CI passed`. A new job in
-  `.github/workflows/ci.yml` joins that job's `needs` list instead of the
-  ruleset; `tests/test_ci_workflow.py` fails when it does not.
-- **Language:** repository in English, conversation in German.
-- **Adventure content** never enters this repository. See
-  [ADR-0003](adr/0003-adventure-content-separation.md).
+```bash
+bash scripts/process/check-kit.sh
+```

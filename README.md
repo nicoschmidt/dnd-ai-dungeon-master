@@ -195,10 +195,12 @@ backend in `tests/`.
 - [What happens when it runs](docs/runtime.md) — processes, the flow of one
   declared action, and where to look when debugging
 - [Decision records](docs/adr/README.md)
-- [Process](docs/process.md) — how work moves from issue to merge
-- [Working agreements for AI assistants](CLAUDE.md)
-- [Handover scripts](scripts/README.md) — the tooling behind the steps that
-  reach GitHub
+- [Process](docs/process.md) — how work moves from idea to merge, following
+  [ai-dev-process](https://github.com/nicoschmidt/ai-dev-process)
+- [Working agreements for AI assistants](CLAUDE.md) — this project's part;
+  the shared rules are in [.claude/rules/process/](.claude/rules/process/)
+- [Scripts](scripts/README.md) — the handover tooling and the repository
+  guards
 
 ## Adventure content
 
