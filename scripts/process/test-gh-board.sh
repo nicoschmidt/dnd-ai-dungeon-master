@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
+# Managed by ai-dev-process.
+#
 # Exercise gh-board.sh against a stand-in for gh. Needs no credentials and
 # writes nothing to GitHub: every gh call is answered from the fixture below,
 # and the write calls are recorded instead of sent.
 #
-#   bash scripts/test-gh-board.sh
+#   bash scripts/process/test-gh-board.sh
 #
-# Run this after changing gh-board.sh. Twice now a broken helper reached the
-# maintainer because nothing here could call the real gh — a stand-in can.
+# Run this after changing gh-board.sh. Twice a broken helper reached the
+# maintainer because nothing could call the real gh — a stand-in can.
 
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -30,7 +32,7 @@ gh() {
 FIXTURE_FIELDS='{"fields":[
  {"id":"F_status","name":"Status","type":"single_select","options":[{"id":"o_ready","name":"Ready"}]},
  {"id":"F_size","name":"Size","type":"single_select","options":[{"id":"o_s","name":"S"},{"id":"o_m","name":"M"},{"id":"o_l","name":"L"}]},
- {"id":"F_iter","name":"Iteration","type":"single_select","options":[{"id":"o_backlog","name":"Backlog"},{"id":"o_001","name":"001 Kampf"}]},
+ {"id":"F_iter","name":"Iteration","type":"single_select","options":[{"id":"o_backlog","name":"Backlog"},{"id":"o_001","name":"001 First"}]},
  {"id":"F_title","name":"Title","type":"text"}]}'
 FIXTURE_ITEMS='{"items":[{"id":"ITEM_13","content":{"type":"Issue","number":13}}]}'
 
@@ -88,7 +90,7 @@ check "writes iteration" \
 echo "an issue not yet on the board"
 : > "$LOG"
 FIXTURE_ITEMS='{"items":[]}'
-out="$(set_issue_fields 99 M "001 Kampf" 2>&1)"; code=$?
+out="$(set_issue_fields 99 M "001 First" 2>&1)"; code=$?
 check "succeeds" "0" "$code"
 check "adds the item first" "ITEM_NEW" "$(sed -n '1s/.*--id \([^ ]*\).*/\1/p' "$LOG")"
 FIXTURE_ITEMS='{"items":[{"id":"ITEM_13","content":{"type":"Issue","number":13}}]}'

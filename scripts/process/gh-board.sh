@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Managed by ai-dev-process.
+#
 # Shared helpers for handing over issues with their board fields already set.
 # Sourced by the other scripts in this directory, and by the one-off
 # create-*.sh scripts that live beside the repository. Not run on its own.
@@ -10,7 +12,7 @@
 # Field and option identifiers are resolved by name every run. A field name is
 # given as a `|`-separated list of candidates, because the board's own wording
 # is the authority and this file is not: the first candidate that exists wins.
-# Run scripts/show-board.sh to see what the board actually calls things.
+# Run scripts/process/show-board.sh to see what the board actually calls things.
 
 # Nothing here names a person or a repository. Both come from the git remote
 # of the checkout the script is run in, and either can be overridden:
@@ -20,6 +22,7 @@
 #                             repository's owner (a user board over an org
 #                             repository, for instance)
 #   PROJECT_NUMBER=n          the board, when the owner has more than one
+#   FIELD_SIZE, FIELD_ITERATION   candidate names for the two fact fields
 GH_REPO="${GH_REPO:-}"
 OWNER="${PROJECT_OWNER:-}"
 NUMBER="${PROJECT_NUMBER:-}"
@@ -29,8 +32,8 @@ BOARD_FIELD_NAME=""
 LAST_ISSUE_URL=""
 LAST_ISSUE_NUMBER=""
 
-FIELD_SIZE="Size|Größe"
-FIELD_ITERATION="Iteration"
+FIELD_SIZE="${FIELD_SIZE:-Size|Größe}"
+FIELD_ITERATION="${FIELD_ITERATION:-Iteration}"
 
 # owner/name from the git remote of the current checkout.
 board_repo() {

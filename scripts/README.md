@@ -1,33 +1,33 @@
-# Handover scripts
+# Scripts
 
-Tooling for the steps that reach GitHub. `CLAUDE.md` requires that every such
-step is handed over ready to run, and these are what make that possible.
+Two kinds live here.
 
-| Script | What it does |
-| --- | --- |
-| `gh-board.sh` | Shared helpers. Sourced, never run on its own. |
-| `show-board.sh` | Prints every field on the project board and its options. Read-only. |
-| `set-issue-fields.sh` | Sets size and iteration on an issue that already exists. |
-| `test-gh-board.sh` | Exercises `gh-board.sh` against a stand-in for `gh`. No credentials, writes nothing. |
-
-Run them from the repository root:
+**`scripts/process/`** is managed by
+[ai-dev-process](https://github.com/nicoschmidt/ai-dev-process) and never
+edited in this repository (`.claude/rules/process/`, `.ai-dev-process.lock`):
+the board helpers behind every handover, idea capture, labels, the check that
+managed files are unchanged, and their stand-in tests.
 
 ```bash
-bash scripts/test-gh-board.sh
-bash scripts/show-board.sh
-bash scripts/set-issue-fields.sh 13 S Backlog
+bash scripts/process/show-board.sh                   # every board field and option, read-only
+bash scripts/process/set-issue-fields.sh 13 S Backlog
+bash scripts/process/capture-idea.sh "<title>"       # an issue labelled idea
+bash scripts/process/check-kit.sh                    # managed files unchanged
+bash scripts/process/test-gh-board.sh
 ```
 
-`gh-board.sh` needs the `project` scope, which `gh auth login` does not grant:
+The board helpers need the `project` scope, which `gh auth login` does not
+grant:
 
 ```bash
 gh auth refresh -s project
 ```
 
+**Everything else here** belongs to this project.
+
 ## Repository guards
 
-Not every script here reaches GitHub. These guard the repository itself and
-run in CI on every pull request:
+These guard the repository itself and run in CI on every pull request:
 
 | Script | What it does |
 | --- | --- |
@@ -50,40 +50,16 @@ where its content comes from. That is either original content written for
 this project, or SRD 5.1/5.2 material, named with its CC-BY-4.0 attribution.
 One `PROVENANCE.md` covers everything below its `fixtures` directory.
 
-## What they assume
-
-Nothing is hardcoded about who owns this project. The repository is read from
-the `origin` remote of the checkout the script runs in, and the board's owner
-defaults to the repository's owner. Three variables override that when the
-guess is wrong:
-
-| Variable | When you need it |
-| --- | --- |
-| `GH_REPO=owner/name` | Running outside a checkout, or against another repository |
-| `PROJECT_OWNER=name` | The board belongs to a different owner than the repository |
-| `PROJECT_NUMBER=n` | That owner has more than one board |
-
-Without a usable `origin` remote the scripts stop and say so rather than
-guessing.
-
 ## What belongs here, and what does not
 
-Tooling belongs here. Content does not.
+Tooling belongs here. Content does not. A drafted issue body, a pull request
+body, or a one-off script that carries either, lives **beside** the
+repository (`../pr-<n>-body.md`, `../create-*.sh`) and is never committed;
+those one-off scripts source `scripts/process/gh-board.sh` from here.
 
-A drafted issue body, a pull request body, or a one-off script that carries
-either, lives **beside** the repository (`../pr-<n>-body.md`,
-`../create-*.sh`) and is never committed: inside the repository it would be a
-second task list next to GitHub issues, which `CLAUDE.md` forbids. Those
-one-off scripts source `scripts/gh-board.sh` from here.
+## In CI
 
-## After changing anything here
-
-Run `bash scripts/test-gh-board.sh`. A script that writes to GitHub is
-exercised against a stand-in before it is handed over — see `CLAUDE.md`. Two
-broken versions of `gh-board.sh` reached the maintainer before that harness
-existed, and both would have failed on their first dry run.
-
-CI does the same on every pull request (the `Scripts` job in
-`.github/workflows/ci.yml`): `bash -n` over every `scripts/*.sh`, then every
-`scripts/test-*.sh`. A new harness named `test-*.sh` is picked up without
-touching the workflow. Running it locally first is still the faster loop.
+The `Scripts` job in `.github/workflows/ci.yml` checks the managed files,
+runs `bash -n` over every script under `scripts/` and `.githooks/`, then every
+`test-*.sh` under `scripts/`. A new harness named `test-*.sh` is picked up
+without touching the workflow.
