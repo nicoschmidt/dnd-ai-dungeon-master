@@ -30,9 +30,13 @@ placeholder, or a step that arrives as an instruction, is a defect.
 - **Status is the maintainer's click.** Moving a card to `Ready`, `In review`
   or `Done` is a judgement about whether the work is there yet; handing it over
   as a command would hand over the judgement with it.
-- Field and option names come from the board, read at run time — not from
-  memory and not from an older script. A lookup that fails prints what the
-  board does have.
+- The board is the one named in `.ai-dev-process.conf`; the helpers read it
+  from there. Field and option names come from the board, read at run time —
+  not from memory and not from an older script. A lookup that fails prints
+  what the board does have.
+- Every block says which repository it runs in: a `cd` to its absolute path,
+  or `--repo owner/name`. In a project of several repositories, a command
+  without one is a defect.
 - Where a step genuinely cannot be a command — a review, a merge, a repository
   setting — name the exact path through the interface.
 

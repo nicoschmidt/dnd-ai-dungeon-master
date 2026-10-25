@@ -26,9 +26,13 @@ Two kinds of session work in this repository, with different capabilities.
 ## Where the process lives
 
 - `.claude/rules/process/` — these rules, managed by ai-dev-process at the
-  version in `.ai-dev-process.lock`. Changed upstream, never here.
+  version and in the role in `.ai-dev-process.lock`. Changed upstream, never
+  here.
+- `.ai-dev-process.conf` — the board, the home repository and the member
+  repositories. Project-owned, the same in every repository of the project.
 - `CLAUDE.md` — what this project is, its hard rules, its process parameters
-  and deviations.
+  and deviations. In a member repository: the home repository's, imported,
+  plus what holds for this repository only.
 - The `ai-dev-process` plugin — the procedures: capturing ideas, refinement,
   handover, ADRs, iteration planning and retro. Its skills follow these rules;
   where a skill and a rule disagree, the rule wins and the skill has a defect.

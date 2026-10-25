@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Managed by ai-dev-process.
 #
-# Create or update the labels the process relies on. Safe to re-run: existing
-# labels are updated in place, others are left alone.
+# Create the labels the process relies on where they are missing. Existing
+# labels are left as they are — their colour and description belong to the
+# project — unless --update is given.
 #
 #   bash scripts/process/setup-labels.sh
+#   bash scripts/process/setup-labels.sh --update
 #   GH_REPO=owner/name bash scripts/process/setup-labels.sh
 
 set -euo pipefail
@@ -13,19 +15,40 @@ cd "$(git -C "$HERE" rev-parse --show-toplevel)"
 
 command -v gh >/dev/null || { echo "gh is not installed."; exit 1; }
 
+update=0
+case "${1:-}" in
+  '') ;;
+  --update) update=1 ;;
+  *) echo "usage: bash scripts/process/$(basename "$0") [--update]"; exit 1 ;;
+esac
+
 # An empty array expands safely under `set -u` only in bash 4.4 and later;
 # macOS ships bash 3.2, hence the ${x[@]+...} form below.
 repo_args=()
 if [ -n "${GH_REPO:-}" ]; then repo_args=(--repo "$GH_REPO"); fi
 
+existing="$(gh label list --limit 500 --json name -q '.[].name' ${repo_args[@]+"${repo_args[@]}"})" || {
+  echo "Could not list the labels."
+  exit 1
+}
+
 failed=0
 while IFS='|' read -r name color description; do
   [ -n "$name" ] || continue
-  if gh label create "$name" --color "$color" --description "$description" --force ${repo_args[@]+"${repo_args[@]}"} >/dev/null; then
-    echo "label    $name"
+  if grep -qxF "$name" <<< "$existing"; then
+    if [ "$update" -eq 0 ]; then
+      echo "exists   $name"
+      continue
+    fi
+    if gh label edit "$name" --color "$color" --description "$description" ${repo_args[@]+"${repo_args[@]}"} >/dev/null; then
+      echo "updated  $name"
+    else
+      echo "FAILED   $name"; failed=1
+    fi
+  elif gh label create "$name" --color "$color" --description "$description" ${repo_args[@]+"${repo_args[@]}"} >/dev/null; then
+    echo "created  $name"
   else
-    echo "FAILED   $name"
-    failed=1
+    echo "FAILED   $name"; failed=1
   fi
 done <<'LABELS'
 idea|FBCA04|Captured in passing; refined before any work starts

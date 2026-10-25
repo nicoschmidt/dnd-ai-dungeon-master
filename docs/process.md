@@ -32,7 +32,8 @@ An idea is captured where it occurs, in whichever way is nearest:
 - **Phone or browser:** New issue → **Idea**. The title is enough.
 - **Terminal:**
   `bash scripts/process/capture-idea.sh "<title>"` — add `--process` for the
-  way of working.
+  way of working. For an idea about the whole project, from a member
+  repository: `GH_REPO=<home repository> bash scripts/process/capture-idea.sh "<title>"`.
 - **A chat session:** say "Idee: …". The assistant writes the title and a
   prefilled link to the Idea form; one tap submits it.
 - **Claude Code:** say "capture: …". It creates the issue directly — the one
@@ -98,6 +99,20 @@ a command, is a defect — say so.
 
    `gh repo edit --delete-branch-on-merge` makes the remote half unnecessary.
 
+## Several repositories
+
+A project may be one repository or several; `.ai-dev-process.conf` names the
+board, the home repository and the members, and
+`.claude/rules/process/repositories.md` says what lives where. In short:
+
+- vision, ADRs, iterations and epics are in the home repository; code and
+  data, with their own issues, in the members
+- all repositories are checked out beside each other; a member's `CLAUDE.md`
+  imports the home repository's
+- one board for all of them; one issue and one pull request per repository
+  for work that spans several, under an epic in the home repository
+- nothing from a private repository reaches a public one
+
 ## When something goes wrong
 
 **Branch has fallen behind `main`**
@@ -122,6 +137,11 @@ in the pull request, or finish the first and rebase the second.
 **An iteration keeps growing.** Cut the goal, move the remainder to issues.
 
 **A decision was made without an ADR.** Stop, write it, then continue.
+
+**A handover script says it found several boards.** `board_number` in
+`.ai-dev-process.conf` is not set yet. `gh project list --owner <owner>`
+shows the numbers; write the right one there, in every repository of the
+project.
 
 **A handover script says a field or an option does not exist.** The board is
 the authority:

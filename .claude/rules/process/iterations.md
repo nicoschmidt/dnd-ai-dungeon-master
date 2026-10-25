@@ -15,9 +15,10 @@ and the **iteration box** are process parameters in `CLAUDE.md`.
   mode this guards against, since nothing else stops it.
 - **When the box is time**: the iteration ends on its date, and what is not
   done returns to refinement.
-- An iteration has a file in `docs/iterations/`, from
+- An iteration has a file in `docs/iterations/` of the home repository, from
   `docs/iterations/TEMPLATE.md`, written before it starts with goal and out of
-  scope filled in. Status is not kept there; it is on the board.
+  scope filled in. Its scope may hold issues of every repository of the
+  project. Status is not kept there; it is on the board.
 - A milestone such as the MVP is not a unit of work. It is the first iteration
   after which the users would choose to use the result, and it is reached by
   iterations like any other.
@@ -27,7 +28,8 @@ and the **iteration box** are process parameters in `CLAUDE.md`.
 The retro note is the iteration file's **Result** and **Process learnings**
 sections. Its input is not memory:
 
-- the open and closed issues labelled `process` since the iteration started
+- the open and closed issues labelled `process` since the iteration started,
+  in every repository of the project
 - the pull requests merged in it, and what their reviews had to correct
 - the issues that were cut, and why
 

@@ -14,6 +14,10 @@ Stop and raise it when:
   not end in something meeting the done criterion
 - an iteration has finished without a retro note
 - a file managed by ai-dev-process is about to be edited in this repository
+- content from a private repository is about to reach a public one
+  (`repositories.md`)
+- work is about to start in a member repository without the home
+  repository's `CLAUDE.md` loaded
 - a request would skip one of the rules in `.claude/rules/process/`
 
 In the last case: name the rule being skipped and what skipping it costs, then

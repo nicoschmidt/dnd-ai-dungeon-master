@@ -3,7 +3,8 @@
 # Decision records
 
 Every decision that is expensive to reverse is recorded as an ADR in
-`docs/adr/` **before** the code implementing it is written. That includes
+`docs/adr/` of the home repository (`repositories.md`) **before** the code
+implementing it is written — in whichever repository that code lives. That includes
 technology choices, interface and data-format decisions, deployment shape, and
 anything that crosses a component boundary. Naming a variable does not need
 one; choosing a persistence format does.
@@ -16,7 +17,9 @@ one; choosing a persistence format does.
   set the old one to `superseded by ADR-XXXX`. Typography, broken links and the
   redaction of personal data may be corrected in place.
 - Accepting an ADR updates, in the same commit, the index in
-  `docs/adr/README.md` and the derived `docs/architecture.md`.
+  `docs/adr/README.md` and the derived `docs/architecture.md`. Where the
+  decision shapes a member repository, that repository's
+  `docs/architecture.md` is updated by its own pull request, in its own words.
 - An accepted ADR's follow-ups become issues before the ADR's pull request is
   merged.
 - An ADR written after the fact is worth much less: the options not taken are

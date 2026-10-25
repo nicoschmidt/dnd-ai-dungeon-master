@@ -61,6 +61,10 @@ genuinely bad afternoon, which is why the rule exists.
 | Board fields (facts) | Size (the board may call it Größe), Iteration |
 | Process repository | nicoschmidt/ai-dev-process |
 
+This repository is the whole project: it is its own home repository, with no
+members. The board is named in `.ai-dev-process.conf`, where the scripts read
+it.
+
 ## Definition of done additions
 
 - No adventure content was added to the repository.

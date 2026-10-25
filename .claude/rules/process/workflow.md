@@ -4,13 +4,17 @@
 
 Binding for every assistant working in this repository. Project-specific
 values — languages, the iteration's done criterion, extra rules — are in
-`CLAUDE.md` under **Process parameters**. Where `CLAUDE.md` records a
-**Process deviation**, the deviation wins.
+`CLAUDE.md` under **Process parameters** (in a member repository, the home
+repository's `CLAUDE.md`, which it imports). Where `CLAUDE.md` records a
+**Process deviation**, the deviation wins. Which repositories belong to the
+project, and where each kind of work lives, is in `repositories.md`.
 
 ## Issues are the only task list
 
 - GitHub issues are the single source of truth for work items. No TODO files,
   no backlog in markdown, no list in a branch.
+- An issue lives in the repository whose contents it changes; work for the
+  whole project, and the epics, live in the home repository.
 - **No work without an issue.** Before the first edit, name the issue and the
   branch. If no issue exists, write one first — or, where the environment
   cannot create it, draft it and hand it over (see `handover.md`).
