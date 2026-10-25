@@ -14,15 +14,18 @@
 # is the authority and this file is not: the first candidate that exists wins.
 # Run scripts/process/show-board.sh to see what the board actually calls things.
 
-# Nothing here names a person or a repository. Both come from the git remote
-# of the checkout the script is run in, and either can be overridden:
+# Nothing here names a person, a repository or a board. The repository comes
+# from the git remote of the checkout the script is run in; the board from
+# .ai-dev-process.conf at the top of that checkout (board_owner,
+# board_number). Each can be overridden for one run:
 #
 #   GH_REPO=owner/name        the repository these issues belong to
-#   PROJECT_OWNER=name        the board's owner, when it differs from the
-#                             repository's owner (a user board over an org
-#                             repository, for instance)
-#   PROJECT_NUMBER=n          the board, when the owner has more than one
+#   PROJECT_OWNER=name        the board's owner
+#   PROJECT_NUMBER=n          the board's number
 #   FIELD_SIZE, FIELD_ITERATION   candidate names for the two fact fields
+#
+# Without either, the board's owner is the repository's owner, and the board
+# is that owner's only one — which stops working the day a second board exists.
 GH_REPO="${GH_REPO:-}"
 OWNER="${PROJECT_OWNER:-}"
 NUMBER="${PROJECT_NUMBER:-}"
@@ -34,6 +37,20 @@ LAST_ISSUE_NUMBER=""
 
 FIELD_SIZE="${FIELD_SIZE:-Size|Größe}"
 FIELD_ITERATION="${FIELD_ITERATION:-Iteration}"
+
+# conf_get <key>: the value from .ai-dev-process.conf at the top of the current
+# checkout. Empty when the file or the key is missing, or the value is still a
+# <placeholder>. The file is read, never sourced: it is data, not code.
+conf_get() {
+  local root file value
+  root="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
+  file="$root/.ai-dev-process.conf"
+  [ -f "$file" ] || return 0
+  value="$(sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*//p" "$file" | tail -n 1)"
+  value="${value%"${value##*[![:space:]]}"}"
+  case "$value" in *'<'*) value="" ;; esac
+  printf '%s' "$value"
+}
 
 # owner/name from the git remote of the current checkout.
 board_repo() {
@@ -61,23 +78,35 @@ board_connect() {
       return 1
     }
   fi
+  local from="environment"
+  [ -n "$OWNER" ] || OWNER="$(conf_get board_owner)"
   [ -n "$OWNER" ] || OWNER="${GH_REPO%%/*}"
+  if [ -z "$NUMBER" ]; then
+    NUMBER="$(conf_get board_number)"
+    from=".ai-dev-process.conf"
+  fi
+  case "$NUMBER" in
+    '') ;;
+    *[!0-9]*) echo "The board number '$NUMBER' (from $from) is not a number."; return 1 ;;
+  esac
 
   if [ -z "$NUMBER" ]; then
     local projects count
     projects="$(gh project list --owner "$OWNER" --format json)"
     count="$(jq '.projects | length' <<<"$projects")"
     if [ "$count" != "1" ]; then
-      echo "Found $count projects for owner '$OWNER'. Re-run with the right one:"
+      echo "Found $count projects for owner '$OWNER', and no board_number in .ai-dev-process.conf."
+      echo "Write the right one there, as board_number=<n>, or set it for one run:"
       jq -r '.projects[] | "  PROJECT_NUMBER=\(.number)  \(.title)"' <<<"$projects"
       return 1
     fi
     NUMBER="$(jq -r '.projects[0].number' <<<"$projects")"
+    from="the owner's only board"
   fi
 
   PROJECT_ID="$(gh project view "$NUMBER" --owner "$OWNER" --format json | jq -r '.id')"
   FIELDS="$(gh project field-list "$NUMBER" --owner "$OWNER" --format json)"
-  echo "Board: $OWNER #$NUMBER   repository: $GH_REPO"
+  echo "Board: $OWNER #$NUMBER ($from)   repository: $GH_REPO"
 }
 
 board_show() {         # every field, and the options of every single select

@@ -18,7 +18,8 @@ printf '%s\n' "$*" >> "$GH_LOG"
 if [ "${GH_FAIL:-}" = "1" ]; then exit 1; fi
 case "$1 $2" in
   "issue create") echo "https://github.com/example-owner/example-repo/issues/23" ;;
-  "label create") ;;
+  "label list") printf '%s\n' ${GH_EXISTING_LABELS:-} ;;
+  "label create"|"label edit") ;;
   *) echo "unexpected gh call: $*" >&2; exit 1 ;;
 esac
 STANDIN
@@ -61,7 +62,7 @@ out="$(GH_FAIL=1 bash "$HERE/capture-idea.sh" "Anything" 2>&1)"; code=$?
 check "fails" "1" "$code"
 check "reports no capture" "0" "$(grep -c '^captured' <<<"$out")"
 
-echo "labels"
+echo "labels in a repository that has none"
 : > "$GH_LOG"
 out="$(bash "$HERE/setup-labels.sh" 2>&1)"; code=$?
 check "succeeds" "0" "$code"
@@ -69,7 +70,20 @@ check "creates six labels" "6" "$(grep -c '^label create' "$GH_LOG")"
 check "without --repo by default" "0" "$(grep -c -- '--repo' "$GH_LOG")"
 : > "$GH_LOG"
 out="$(GH_REPO=o/r bash "$HERE/setup-labels.sh" 2>&1)"; code=$?
-check "passes GH_REPO through" "6" "$(grep -c -- '--repo o/r' "$GH_LOG")"
+check "passes GH_REPO through" "7" "$(grep -c -- '--repo o/r' "$GH_LOG")"
+
+echo "labels in a repository that has some"
+: > "$GH_LOG"
+out="$(GH_EXISTING_LABELS="type:feature type:bug" bash "$HERE/setup-labels.sh" 2>&1)"; code=$?
+check "succeeds" "0" "$code"
+check "creates only the four missing" "4" "$(grep -c '^label create' "$GH_LOG")"
+check "leaves existing ones alone" "0" "$(grep -c '^label edit' "$GH_LOG")"
+check "reports them" "2" "$(grep -c '^exists' <<<"$out")"
+: > "$GH_LOG"
+out="$(GH_EXISTING_LABELS="type:feature type:bug" bash "$HERE/setup-labels.sh" --update 2>&1)"; code=$?
+check "--update edits the existing ones" "2" "$(grep -c '^label edit' "$GH_LOG")"
+out="$(bash "$HERE/setup-labels.sh" --colour 2>&1)"; code=$?
+check "an unknown option fails" "1" "$code"
 out="$(GH_FAIL=1 bash "$HERE/setup-labels.sh" 2>&1)"; code=$?
 check "fails loudly when gh fails" "1" "$code"
 

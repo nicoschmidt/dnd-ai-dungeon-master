@@ -18,7 +18,7 @@ FAILURES=0
 
 gh() {
   case "$1 $2" in
-    "project list") echo '{"projects":[{"number":1,"title":"Board"}]}' ;;
+    "project list") echo "$FIXTURE_PROJECTS" ;;
     "project view") echo '{"id":"PVT_test"}' ;;
     "project field-list") echo "$FIXTURE_FIELDS" ;;
     "project item-list") echo "$FIXTURE_ITEMS" ;;
@@ -35,6 +35,7 @@ FIXTURE_FIELDS='{"fields":[
  {"id":"F_iter","name":"Iteration","type":"single_select","options":[{"id":"o_backlog","name":"Backlog"},{"id":"o_001","name":"001 First"}]},
  {"id":"F_title","name":"Title","type":"text"}]}'
 FIXTURE_ITEMS='{"items":[{"id":"ITEM_13","content":{"type":"Issue","number":13}}]}'
+FIXTURE_PROJECTS='{"projects":[{"number":1,"title":"Board"}]}'
 
 export GH_REPO="example-owner/example-repo"
 
@@ -66,6 +67,38 @@ git -C "$tmp" remote remove origin
 ( cd "$tmp" && board_repo ) >/dev/null 2>&1
 check "no remote fails" "1" "$?"
 rm -rf "$tmp"
+
+echo "the board from .ai-dev-process.conf"
+tmp="$(mktemp -d)"
+git -C "$tmp" init -q
+reconnect() {          # reconnect: forget the board, connect again from $tmp
+  OWNER="${PROJECT_OWNER:-}"; NUMBER="${PROJECT_NUMBER:-}"
+  ( cd "$tmp" && board_connect 2>&1 )
+}
+FIXTURE_PROJECTS='{"projects":[{"number":1,"title":"One"},{"number":7,"title":"Seven"}]}'
+out="$(reconnect)"; code=$?
+check "two boards and no conf fails" "1" "$code"
+check "names the conf file" "1" "$(grep -c 'no board_number in .ai-dev-process.conf' <<<"$out")"
+check "lists both boards" "2" "$(grep -c '  PROJECT_NUMBER=' <<<"$out")"
+printf '# facts\nboard_owner=conf-owner\nboard_number=7   \nhome_repo=o/r\n' > "$tmp/.ai-dev-process.conf"
+out="$(reconnect)"; code=$?
+check "two boards and a conf succeeds" "0" "$code"
+check "owner and number come from the conf" "1" "$(grep -c '^Board: conf-owner #7 (.ai-dev-process.conf)' <<<"$out")"
+out="$(PROJECT_NUMBER=1 reconnect)"; code=$?
+check "the environment overrides the conf" "1" "$(grep -c '^Board: conf-owner #1 (environment)' <<<"$out")"
+printf 'board_owner=<owner>\nboard_number=<number>\n' > "$tmp/.ai-dev-process.conf"
+out="$(reconnect)"; code=$?
+check "placeholders count as unset" "1" "$code"
+check "and fall back to the repository's owner" "1" "$(grep -c "owner 'example-owner'" <<<"$out")"
+printf 'board_number=seven\n' > "$tmp/.ai-dev-process.conf"
+out="$(reconnect)"; code=$?
+check "a number that is not one fails" "1" "$code"
+FIXTURE_PROJECTS='{"projects":[{"number":1,"title":"Board"}]}'
+rm -f "$tmp/.ai-dev-process.conf"
+out="$(reconnect)"; code=$?
+check "one board and no conf still works" "1" "$(grep -c "^Board: example-owner #1 (the owner's only board)" <<<"$out")"
+rm -rf "$tmp"
+board_connect >/dev/null
 
 echo "the issue url is built from that repository"
 : > "$ADDLOG"

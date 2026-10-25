@@ -32,7 +32,7 @@ changed=0
 missing=0
 count=0
 while read -r expected path; do
-  case "$expected" in ''|'#'*|version|source) continue ;; esac
+  case "$expected" in ''|'#'*|version|source|role) continue ;; esac
   count=$((count + 1))
   if [ ! -f "$ROOT/$path" ]; then
     echo "missing  $path"
