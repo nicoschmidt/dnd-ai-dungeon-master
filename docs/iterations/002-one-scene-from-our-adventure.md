@@ -20,8 +20,16 @@ rather than by the model's discretion.
 
 Epic: #36.
 
+- #33 — the session journal, first: the encounters of 001 were played on
+  plausibility, and from 002 on the journal carries adventure text, so it is
+  kept like the package ([ADR-0003](../adr/0003-adventure-content-separation.md))
+- #34 — the game master view
 - #4 — the v1 adventure schema
 - #35 — the shape of the ingest pipeline (an ADR before any pipeline code)
+
+#33 and #34 moved here from [001](001-one-combat-encounter.md), whose goal was
+playable without them. Iteration [001a](001a-the-table-screen.md) comes between
+the two.
 
 Content work for this iteration may run while 001 is still open — the
 maintainer decided so on 2026-09-26, pipeline code included. The issues still
