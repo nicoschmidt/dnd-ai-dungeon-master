@@ -39,8 +39,13 @@ it.
 | Iteration | Goal in brief | Proves |
 | --- | --- | --- |
 | [001](001-one-combat-encounter.md) | One combat encounter against one opponent | The engine: streaming, the tool boundary, deterministic rules, the party panel |
+| [001a](001a-the-table-screen.md) | A table screen for an evening of play | The table: state in view, the group's language, a party that is saved |
 | [002](002-one-scene-from-our-adventure.md) | One scene from the maintainer's own adventure | The content boundary: schema, loader, hidden and revealed information |
 | [003](003-one-evening-of-play.md) | One evening through one chapter | **The MVP.** Ingest from the scan, scene progression, resuming after a restart |
+
+An iteration found to be needed between two planned ones takes the number
+before it with a letter, like 001a. Planned numbers are referred to from ADRs,
+code and issues, so they are never shifted.
 
 Status is not kept here. Which issues are open, in progress or done is on the
 board and in each iteration's epic; this table says only what each iteration
