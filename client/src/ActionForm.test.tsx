@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ActionForm } from './ActionForm.tsx'
@@ -40,31 +40,61 @@ function renderForm(
   return { ...view, onDeclare }
 }
 
+// The name on the pressed button: the character the action will be sent with.
 function chosen(): string {
-  return (screen.getByLabelText('Acting character') as HTMLSelectElement).value
+  const actors = within(screen.getByRole('group', { name: 'Acting character' }))
+  return actors.getByRole('button', { pressed: true }).textContent ?? ''
+}
+
+function markedAsTheirTurn(): string[] {
+  return screen
+    .getAllByRole('button')
+    .filter((button) => button.getAttribute('aria-current') === 'true')
+    .map((button) => button.textContent ?? '')
 }
 
 describe('ActionForm', () => {
   it('preselects the character whose turn it is', () => {
     renderForm(turnOf(2))
 
-    expect(chosen()).toBe('mira')
+    expect(chosen()).toBe('Mira')
+  })
+
+  it('offers one button per character and one for the whole table', () => {
+    renderForm(null)
+
+    const actors = within(screen.getByRole('group', { name: 'Acting character' }))
+    expect(actors.getAllByRole('button').map((b) => b.textContent)).toEqual([
+      'The table',
+      'Brann',
+      'Mira',
+    ])
+  })
+
+  it('marks the character whose turn it is, also when the table picks someone else', () => {
+    renderForm(turnOf(0))
+    expect(markedAsTheirTurn()).toEqual(['Brann'])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mira' }))
+    expect(chosen()).toBe('Mira')
+    expect(markedAsTheirTurn()).toEqual(['Brann'])
   })
 
   it("preselects nobody on the opponent's turn or outside an encounter", () => {
     const { rerender } = renderForm(turnOf(1))
-    expect(chosen()).toBe('')
+    expect(chosen()).toBe('The table')
+    expect(markedAsTheirTurn()).toEqual([])
 
     rerender(<ActionForm party={party} encounter={null} busy={false} onDeclare={vi.fn()} />)
-    expect(chosen()).toBe('')
+    expect(chosen()).toBe('The table')
   })
 
   it('moves the preselection when the turn passes', () => {
     const { rerender, onDeclare } = renderForm(turnOf(0))
-    expect(chosen()).toBe('brann')
+    expect(chosen()).toBe('Brann')
 
     rerender(<ActionForm party={party} encounter={turnOf(2)} busy={false} onDeclare={onDeclare} />)
-    expect(chosen()).toBe('mira')
+    expect(chosen()).toBe('Mira')
   })
 
   it('sends the acting character with the declared action', async () => {
@@ -85,7 +115,7 @@ describe('ActionForm', () => {
   it('lets the table pick someone else', async () => {
     const { onDeclare } = renderForm(turnOf(0))
 
-    fireEvent.change(screen.getByLabelText('Acting character'), { target: { value: 'mira' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Mira' }))
     fireEvent.change(screen.getByLabelText('Declared action'), { target: { value: 'I help' } })
     fireEvent.submit(screen.getByLabelText('Declared action'))
 
