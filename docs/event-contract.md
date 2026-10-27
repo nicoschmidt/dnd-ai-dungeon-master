@@ -116,6 +116,10 @@ dice they rolled in their own words, and `character_id`, the acting character,
 or `null` when the action is the table's rather than one character's. The
 client preselects whoever's turn it is.
 
+A roll has no field of its own. The client's dice block appends it to `text`
+as a line — `d20: 14 + 5 = 19`, `d20: 14 − 1 = 13`, `d8: 6` — the same whether
+the die was rolled at the table or by the client at the player's click.
+
 ## Entering the party
 
 `PartyEntry` is the party as the group types it in before the fight

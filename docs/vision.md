@@ -9,8 +9,9 @@ master's chair so that everyone at the table can be a player.
 
 ## The experience we are building for
 
-Everyone sits at one table. Pen, paper, character sheets and physical dice.
-The AI:
+Everyone sits at one table. Pen, paper, character sheets and dice. A player
+rolls their own dice, or lets the table screen roll one for them at their
+click: either way the roll is the player's. The AI:
 
 - knows the adventure and holds its structure, secrets and pacing
 - narrates scenes and describes what the characters perceive
@@ -37,7 +38,7 @@ In scope:
 Explicitly not in scope (for now):
 
 - Players in different locations, with synchronised state across devices.
-- Digital dice, digital character sheets, virtual tabletop or battle maps.
+- Digital character sheets, virtual tabletop or battle maps.
 - Accounts, multi-tenancy, or hosting the app for other groups.
 - Distributing adventure content of any kind.
 

@@ -49,7 +49,9 @@ its own.
 ## Dice
 
 - The players roll their own dice and report **totals**, with the natural d20
-  result when it is a 1 or a 20.
+  result when it is a 1 or a 20. A player may let the table screen roll a die
+  at their click; that roll is still the player's, and reaches the model as
+  text like any other (`d20: 14 + 5 = 19`).
 - The code rolls for the opponent. It never rolls for a player character.
 - Every roll the code makes is a record: purpose, dice expression, the
   individual dice, the modifier, the total, and the mode (normal, advantage,
