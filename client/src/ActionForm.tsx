@@ -11,8 +11,8 @@ interface Props {
 }
 
 // The one input of the table: a declared action and the dice rolled for it,
-// sent with the acting character. Whoever's turn it is is preselected; the
-// table can pick someone else, or nobody.
+// sent with the acting character. Whoever's turn it is is preselected and
+// marked; the table can pick someone else, or nobody.
 export function ActionForm({ party, encounter, busy, onDeclare }: Props) {
   const acting = actingCharacterId(encounter)
   const [text, setText] = useState('')
@@ -31,29 +31,35 @@ export function ActionForm({ party, encounter, busy, onDeclare }: Props) {
     if (await onDeclare(action)) setText('')
   }
 
+  // '' is the whole table: an action nobody in particular declares.
+  const actors = [{ id: '', name: 'The table' }, ...party]
+
   return (
     <form className="action" onSubmit={declare}>
-      <select
-        aria-label="Acting character"
-        value={chosen}
-        onChange={(event) => setSelection({ acting, chosen: event.target.value })}
-      >
-        <option value="">The table</option>
-        {party.map((character) => (
-          <option key={character.id} value={character.id}>
-            {character.name}
-          </option>
+      <div className="actors" role="group" aria-label="Acting character">
+        {actors.map(({ id, name }) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={id === chosen}
+            aria-current={id !== '' && id === acting ? 'true' : undefined}
+            onClick={() => setSelection({ acting, chosen: id })}
+          >
+            {name}
+          </button>
         ))}
-      </select>
-      <input
-        aria-label="Declared action"
-        placeholder="What do you do? Include what you rolled."
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
-      <button type="submit" disabled={busy || !text.trim()}>
-        Declare
-      </button>
+      </div>
+      <div className="declare">
+        <input
+          aria-label="Declared action"
+          placeholder="What do you do? Include what you rolled."
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+        />
+        <button type="submit" disabled={busy || !text.trim()}>
+          Declare
+        </button>
+      </div>
     </form>
   )
 }

@@ -2,7 +2,8 @@ import { useState } from 'react'
 
 import { ActionForm } from './ActionForm.tsx'
 import type { DeclaredAction } from './contract/index.ts'
-import { PartyForm } from './party/PartyForm.tsx'
+import { Narration } from './Narration.tsx'
+import { PartyDialog } from './party/PartyDialog.tsx'
 import { StatusPanel } from './party/StatusPanel.tsx'
 import { type Connection, useTableStream } from './stream/useTableStream.ts'
 
@@ -39,48 +40,39 @@ function App() {
   }
 
   return (
-    <main>
-      <header>
+    <div className="table">
+      <header className="table-header">
         <h1>AI Dungeon Master</h1>
         <p className="connection">{CONNECTION_LABEL[connection]}</p>
+        <div className="party">
+          {partyFixed ? (
+            <p className="note">The party is fixed for this encounter.</p>
+          ) : (
+            <button type="button" onClick={() => setEditingParty(true)}>
+              {state.party.length === 0 ? 'Enter the party' : 'Edit the party'}
+            </button>
+          )}
+        </div>
       </header>
 
+      <main className="story">
+        <Narration turns={state.turns} party={state.party} />
+        {state.error && <p role="alert">{state.error.message}</p>}
+        {sendError && <p role="alert">{sendError}</p>}
+        <ActionForm
+          party={state.party}
+          encounter={state.encounter}
+          busy={state.busy}
+          onDeclare={declare}
+        />
+      </main>
+
       <StatusPanel party={state.party} encounter={state.encounter} />
-      {partyFixed ? (
-        <p className="note">The party is fixed for this encounter.</p>
-      ) : editingParty ? (
-        <PartyForm party={state.party} onClose={() => setEditingParty(false)} />
-      ) : (
-        <button type="button" onClick={() => setEditingParty(true)}>
-          {state.party.length === 0 ? 'Enter the party' : 'Edit the party'}
-        </button>
+
+      {editingParty && !partyFixed && (
+        <PartyDialog party={state.party} onClose={() => setEditingParty(false)} />
       )}
-
-      <section className="narration" aria-label="Narration" aria-live="polite">
-        {state.turns.map((turn) => {
-          const speaker = state.party.find((c) => c.id === turn.action.character_id)
-          return (
-            <article key={turn.id}>
-              <p className="declared">
-                {speaker ? `${speaker.name}: ` : ''}
-                {turn.action.text}
-              </p>
-              <p>{turn.narration}</p>
-            </article>
-          )
-        })}
-      </section>
-
-      {state.error && <p role="alert">{state.error.message}</p>}
-      {sendError && <p role="alert">{sendError}</p>}
-
-      <ActionForm
-        party={state.party}
-        encounter={state.encounter}
-        busy={state.busy}
-        onDeclare={declare}
-      />
-    </main>
+    </div>
   )
 }
 

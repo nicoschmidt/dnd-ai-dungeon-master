@@ -1,72 +1,413 @@
+/* The table's look, in one place. Every colour, spacing and type size is a
+   token here; the rules below only refer to them.
+
+   Every text colour has a contrast of at least 4.5:1 against every surface it
+   is set on (WCAG AA). Text is never dimmed with opacity, which would quietly
+   break that: a quieter text uses --color-text-muted instead. */
 :root {
-  font-family: system-ui, sans-serif;
+  --color-bg: #14161b;
+  --color-surface: #1c1f26;
+  --color-surface-raised: #262a33;
+  --color-border: #363b46;
+  --color-text: #ebe7df;
+  --color-text-muted: #aaa59b;
+  --color-accent: #e0b04f;
+  --color-on-accent: #1a1408;
+  --color-danger: #f08a7e;
+  --color-hit-points: #6fbf73;
+  --color-temporary: #7db4e6;
+  --color-backdrop: rgb(0 0 0 / 0.6);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  --font-ui: system-ui, sans-serif;
+  --font-narration: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-size-small: 0.875rem;
+  --font-size-ui: 1rem;
+  --font-size-heading: 1.125rem;
+  --font-size-narration: 1.25rem;
+  --line-height-narration: 1.6;
+
+  --radius: 0.375rem;
+  --border-marker: 3px;
+  --hit-point-bar-height: 0.375rem;
+  --state-pane-width: 22rem;
+  --narration-measure: 42rem;
+
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
   line-height: 1.5;
-  color-scheme: light dark;
+  color-scheme: dark;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 body {
-  margin: 0 auto;
-  max-width: 48rem;
-  padding: 2rem 1rem;
+  margin: 0;
 }
 
-.connection {
-  opacity: 0.7;
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+  cursor: pointer;
+}
+
+button:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+input {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+[role='alert'] {
+  color: var(--color-danger);
+}
+
+/* The table screen: a header across the top, the narration with its input
+   below it on the left, the state pane on the right. The page itself never
+   scrolls; each pane does, on its own. */
+.table {
+  display: grid;
+  grid-template-areas:
+    'header header'
+    'story state';
+  grid-template-columns: minmax(0, 1fr) var(--state-pane-width);
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Narrower screens stack the panes: the state above, the story below it, the
+   input still pinned at the bottom. */
+@media (width < 1024px) {
+  .table {
+    grid-template-areas:
+      'header'
+      'state'
+      'story';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, auto) minmax(0, 1fr);
+  }
+
+  .state-pane {
+    max-height: 40dvh;
+    border-left: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+}
+
+.table-header {
+  grid-area: header;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.table-header h1 {
+  margin: 0;
+  font-size: var(--font-size-heading);
+}
+
+.table-header .connection,
+.table-header .note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.table-header .party {
+  margin-left: auto;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.story {
+  grid-area: story;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.story > [role='alert'] {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+}
+
+/* The narration */
+
+.narration {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+.narration article {
+  max-width: var(--narration-measure);
+  margin: 0 auto var(--space-6);
 }
 
 .narration p {
+  margin: 0 0 var(--space-2);
   /* Narration arrives with paragraph breaks between what the dungeon master
      says before and after a tool call. */
   white-space: pre-wrap;
 }
 
+.narration .told {
+  font-family: var(--font-narration);
+  font-size: var(--font-size-narration);
+  line-height: var(--line-height-narration);
+}
+
 .narration .declared {
   font-style: italic;
-  opacity: 0.7;
+  color: var(--color-text-muted);
 }
 
-form {
+.narration .empty {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* The input, pinned below the narration */
+
+.action {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
-form input {
+.action .actors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.action .actors button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Whose turn it is, whether or not the table picked someone else. */
+.action .actors button[aria-current='true']::before {
+  content: '▸ ';
+}
+
+.action .declare {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.action .declare input {
   flex: 1;
+  min-width: 0;
 }
 
-.status ul {
+/* The state pane */
+
+.state-pane {
+  grid-area: state;
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.state-pane h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-heading);
+}
+
+.state-pane ul,
+.state-pane ol {
   list-style: none;
+  margin: 0;
   padding: 0;
 }
 
-.status li {
-  padding: 0.25rem 0.5rem;
-  border-left: 3px solid transparent;
+.encounter {
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.status li.acting {
-  border-left-color: currentColor;
+.encounter .round {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.turn-order {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.turn-order li {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-small);
+}
+
+.turn-order li.opponent {
+  color: var(--color-danger);
+}
+
+.turn-order li[aria-current='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   font-weight: 600;
 }
 
-.status .class,
-.status .temporary,
-.status .conditions {
-  opacity: 0.75;
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: var(--border-marker) solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+}
+
+.card[aria-current='true'] {
+  border-left-color: var(--color-accent);
+}
+
+.card .heading {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.card .class,
+.card .armour-class {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.card .hit-points {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.card .temporary {
+  color: var(--color-temporary);
+}
+
+.card .bar {
+  height: var(--hit-point-bar-height);
+  margin-top: var(--space-1);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.card .bar > div {
+  height: 100%;
+  background: var(--color-hit-points);
+}
+
+.card .conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+}
+
+.card .conditions span {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-small);
+}
+
+/* A character at 0 hit points: dying, stable or dead. */
+.card.down {
+  border-color: var(--color-danger);
+  background: var(--color-surface);
+}
+
+.card.down .name {
+  text-decoration: line-through;
+}
+
+.card.down .hit-points {
+  color: var(--color-danger);
+}
+
+/* The party dialog */
+
+.party-dialog {
+  max-width: min(60rem, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-4));
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.party-dialog::backdrop {
+  background: var(--color-backdrop);
+}
+
+.party-form h2 {
+  margin-top: 0;
 }
 
 .party-form fieldset {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2);
   align-items: flex-end;
-  margin-bottom: 0.5rem;
+  margin: 0 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 .party-form label {
   display: flex;
   flex-direction: column;
-  font-size: 0.85rem;
+  font-size: var(--font-size-small);
 }
 
 .party-form input {
@@ -74,6 +415,6 @@ form input {
 }
 
 .party-form .error {
-  color: #c62828;
+  color: var(--color-danger);
   max-width: 12rem;
 }
