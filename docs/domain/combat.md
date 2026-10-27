@@ -170,6 +170,12 @@ The model ends the encounter with an outcome: `opponent_defeated`,
 `party_defeated` while any character is conscious, so the outcome and the state
 cannot disagree.
 
+After the end, the model may go on narrating: how the fight's aftermath looks,
+what the party finds, where the story turns. The tools that touch the opponent
+refuse once the encounter has ended. Damage, healing, temporary hit points and
+conditions on a character still go through their tools, and a new encounter can
+be started.
+
 ## Damage
 
 Applied by the code, in this order, whoever the target is:
