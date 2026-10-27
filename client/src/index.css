@@ -1,93 +1,235 @@
-/* The table's look, in one place. Every colour, spacing and type size is a
-   token here; the rules below only refer to them.
+/* The table's look, in one place. Every colour, radius, type value and
+   spacing is a token here; the rules below only refer to them. The values
+   are those of the mockup approved in #63.
 
    Every text colour has a contrast of at least 4.5:1 against every surface it
-   is set on (WCAG AA). Text is never dimmed with opacity, which would quietly
-   break that: a quieter text uses --color-text-muted instead. */
+   is set on (WCAG AA). The one place with opacity is a character at 0 hit
+   points, at 78 %: there, text stays at --text-muted or brighter, which keeps
+   5:1; --text-faint would fall below.
+
+   The accent marks exactly three things: whose turn it is, the primary
+   button, and the running fight. Nothing else uses it. */
 :root {
-  --color-bg: #14161b;
-  --color-surface: #1c1f26;
-  --color-surface-raised: #262a33;
-  --color-border: #363b46;
-  --color-text: #ebe7df;
-  --color-text-muted: #aaa59b;
-  --color-accent: #e0b04f;
-  --color-on-accent: #1a1408;
-  --color-danger: #f08a7e;
-  --color-hit-points: #6fbf73;
-  --color-temporary: #7db4e6;
-  --color-backdrop: rgb(0 0 0 / 0.6);
+  /* surfaces */
+  --bg: #121419;
+  --pane: #16191e;
+  --card: #1d2027;
+  --field: #20242c;
+  --sunken: #191c22;
+  --dialog: #191c22;
+  --condition-bg: #2a2e37;
+  --backdrop: rgb(11 12 15 / 0.85);
+  /* lines */
+  --line: #2c313b;
+  --line-strong: #3a404c;
+  --line-subtle: #23272f;
+  --condition-line: #4a505c;
+  /* text */
+  --text: #eceae4;
+  --text-narration: #e4e1d9;
+  --text-secondary: #c9cdd4;
+  --text-control: #dcdfe4;
+  --text-muted: #a9aeb8;
+  --text-faint: #8b919c;
+  --text-error: #f08a7e;
+  /* accent */
+  --accent: #e8b04b;
+  --on-accent: #1a1406;
+  --accent-tint: #2a2618;
+  --acting-card: #24221c;
+  /* hit points */
+  --hp-ok: #5bc0a8;
+  --hp-low: #e08a3c;
+  --hp-temp: #8ec5f0;
+  --hp-track: #2c313b;
+  /* connection */
+  --connected: #5bc0a8;
+  --disconnected: #e08a3c;
+  /* avatars, by position in the party: presentation only, not state */
+  --avatar-1: #7c9bd9;
+  --avatar-2: #c6a6e8;
+  --avatar-3: #e39a7b;
+  --avatar-4: #8fcfb0;
+  --avatar-5: #d98fa8;
 
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
+  /* type */
+  --font-ui: Inter, system-ui, sans-serif;
+  --font-narration: Literata, Georgia, serif;
+  --font-code: ui-monospace, Menlo, monospace;
+  --narration-size: 20px;
+  --narration-leading: 1.65;
+  --type-badge: 10px;
+  --type-tag: 11px;
+  --type-label: 12px;
+  --type-small: 13px;
+  --type-control: 14px;
+  --type-body: 15px;
+  --type-name: 16px;
+  --type-number: 17px;
+  --type-title: 22px;
 
-  --font-ui: system-ui, sans-serif;
-  --font-narration: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-size-small: 0.875rem;
-  --font-size-ui: 1rem;
-  --font-size-heading: 1.125rem;
-  --font-size-narration: 1.25rem;
-  --line-height-narration: 1.6;
+  /* shape */
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --radius-input: 12px;
+  --radius-pill: 999px;
+  --radius-row: 8px;
+  --radius-dialog: 18px;
+  --shadow-dialog: 0 24px 64px rgb(0 0 0 / 0.5);
 
-  --radius: 0.375rem;
-  --border-marker: 3px;
-  --hit-point-bar-height: 0.375rem;
-  --state-pane-width: 22rem;
-  --narration-measure: 42rem;
+  /* spacing, named by size */
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-36: 36px;
+  --space-40: 40px;
+
+  /* sizes */
+  --touch: 44px;
+  --pill-height: 36px;
+  --avatar-small: 30px;
+  --avatar-large: 36px;
+  --bar-height: 8px;
+  --dot: 8px;
+  --state-pane-width: 360px;
+  --column: 720px;
+  --dialog-width: 980px;
+  --dialog-rows-min: 760px;
+  --declare-width: 116px;
+  --shield-width: 44px;
+  --shield-height: 46px;
+  --radius-shield: 10px 10px 18px 18px;
+  --padding-badge: 2px 7px;
+  --padding-condition: 3px 9px;
+  --focus-ring: 2px;
 
   font-family: var(--font-ui);
-  font-size: var(--font-size-ui);
+  font-size: var(--type-body);
   line-height: 1.5;
   color-scheme: dark;
-  color: var(--color-text);
-  background: var(--color-bg);
+  color: var(--text);
+  background: var(--bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  background: var(--bg);
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
   color: inherit;
 }
 
 button {
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface-raised);
   cursor: pointer;
 }
 
 button:disabled {
-  color: var(--color-text-muted);
   cursor: default;
 }
 
-input {
-  padding: var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-bg);
-}
-
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: var(--focus-ring) solid var(--text-control);
+  outline-offset: var(--focus-ring);
 }
 
 [role='alert'] {
-  color: var(--color-danger);
+  color: var(--text-error);
 }
 
-/* The table screen: a header across the top, the narration with its input
-   below it on the left, the state pane on the right. The page itself never
-   scrolls; each pane does, on its own. */
+.eyebrow {
+  margin: 0;
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tag {
+  font-size: var(--type-tag);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.avatar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-large);
+  height: var(--avatar-large);
+  border-radius: 50%;
+  font-size: var(--type-small);
+  font-weight: 700;
+  color: var(--bg);
+}
+
+.avatar.small {
+  width: var(--avatar-small);
+  height: var(--avatar-small);
+  font-size: var(--type-label);
+}
+
+.avatar-1 { background: var(--avatar-1); }
+.avatar-2 { background: var(--avatar-2); }
+.avatar-3 { background: var(--avatar-3); }
+.avatar-4 { background: var(--avatar-4); }
+.avatar-5 { background: var(--avatar-5); }
+
+.primary {
+  min-height: var(--touch);
+  padding: 0 var(--space-20);
+  border: none;
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch);
+  padding: 0 var(--space-16);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: var(--type-control);
+}
+
+/* A disabled primary button loses the accent: the accent marks what can be
+   done now. */
+.primary:disabled {
+  background: var(--field);
+  color: var(--text-muted);
+}
+
+/* The table screen: the header across the top, the story (narration and the
+   input pinned below it) on the left, the state pane on the right. The page
+   never scrolls; each pane does, on its own. */
 .table {
   display: grid;
   grid-template-areas:
@@ -99,54 +241,96 @@ input {
   height: 100dvh;
 }
 
-/* Narrower screens stack the panes: the state above, the story below it, the
-   input still pinned at the bottom. */
-@media (width < 1024px) {
-  .table {
-    grid-template-areas:
-      'header'
-      'state'
-      'story';
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, auto) minmax(0, 1fr);
-  }
-
-  .state-pane {
-    max-height: 40dvh;
-    border-left: none;
-    border-bottom: 1px solid var(--color-border);
-  }
+.state-strip {
+  display: none;
 }
+
+/* The header */
 
 .table-header {
   grid-area: header;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
   align-items: center;
-  padding: var(--space-2) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
+  gap: var(--space-12) var(--space-20);
+  padding: var(--space-12) var(--space-24);
+  border-bottom: 1px solid var(--line);
+  background: var(--pane);
 }
 
-.table-header h1 {
-  margin: 0;
-  font-size: var(--font-size-heading);
-}
-
-.table-header .connection,
-.table-header .note {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-small);
-}
-
-.table-header .party {
-  margin-left: auto;
+.brand {
   display: flex;
-  gap: var(--space-3);
   align-items: center;
+  gap: var(--space-10);
+  margin: 0 auto 0 0;
+  font-size: var(--type-name);
+  font-weight: 600;
 }
+
+.brand svg {
+  stroke: var(--accent);
+}
+
+.fight-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0;
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--field);
+  font-size: var(--type-control);
+}
+
+.fight-pill .round {
+  color: var(--text-muted);
+}
+
+.dot {
+  flex: none;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  font-size: var(--type-small);
+  color: var(--text-muted);
+}
+
+.connection .dot {
+  background: var(--disconnected);
+}
+
+.connection.open .dot {
+  background: var(--connected);
+}
+
+.party-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch);
+  padding: 0 var(--space-14);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--field);
+  font-size: var(--type-control);
+}
+
+.party-button:disabled {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* The story: the narration, and the input pinned below it */
 
 .story {
   grid-area: story;
@@ -155,266 +339,612 @@ input {
   min-height: 0;
 }
 
-.story > [role='alert'] {
-  margin: 0;
-  padding: var(--space-2) var(--space-4);
+.column {
+  max-width: var(--column);
+  margin: 0 auto;
 }
-
-/* The narration */
 
 .narration {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: var(--space-4);
+  padding: var(--space-36) var(--space-40) var(--space-24);
 }
 
-.narration article {
-  max-width: var(--narration-measure);
-  margin: 0 auto var(--space-6);
+.narration .column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
 }
 
-.narration p {
-  margin: 0 0 var(--space-2);
+.narration .turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-14);
+}
+
+.narration .declared {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+.narration .declared p {
+  margin: var(--space-4) 0 0;
+  color: var(--text-secondary);
+}
+
+.narration .declared strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.narration .told {
+  margin: 0;
+  font-family: var(--font-narration);
+  font-size: var(--narration-size);
+  line-height: var(--narration-leading);
+  color: var(--text-narration);
   /* Narration arrives with paragraph breaks between what the dungeon master
      says before and after a tool call. */
   white-space: pre-wrap;
 }
 
-.narration .told {
-  font-family: var(--font-narration);
-  font-size: var(--font-size-narration);
-  line-height: var(--line-height-narration);
-}
-
-.narration .declared {
-  font-style: italic;
-  color: var(--color-text-muted);
-}
-
 .narration .empty {
-  color: var(--color-text-muted);
+  margin: 0;
+  color: var(--text-muted);
   text-align: center;
 }
 
-/* The input, pinned below the narration */
+.story > [role='alert'] {
+  margin: 0;
+  padding: var(--space-8) var(--space-40);
+}
 
 .action {
+  flex: none;
+  padding: var(--space-16) var(--space-40) var(--space-20);
+  border-top: 1px solid var(--line);
+  background: var(--pane);
+}
+
+.action .column {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  gap: var(--space-12);
 }
 
-.action .actors {
+.actors {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-8);
 }
 
-.action .actors button[aria-pressed='true'] {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+.actors .label {
+  margin-right: var(--space-4);
+  font-size: var(--type-small);
+  color: var(--text-muted);
 }
 
-/* Whose turn it is, whether or not the table picked someone else. */
-.action .actors button[aria-current='true']::before {
-  content: '▸ ';
-}
-
-.action .declare {
+.actors [role='radio'] {
   display: flex;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-6);
+  min-height: var(--pill-height);
+  padding: 0 var(--space-14);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--field);
+  color: var(--text-control);
+  font-size: var(--type-control);
 }
 
-.action .declare input {
+.actors [role='radio'][aria-checked='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Whose turn it is, on an unselected pill: the tag alone carries the accent. */
+.actors [role='radio'][aria-checked='false'] .tag {
+  color: var(--accent);
+}
+
+.entry {
+  display: flex;
+  gap: var(--space-10);
+}
+
+.entry textarea {
   flex: 1;
   min-width: 0;
+  resize: none;
+  padding: var(--space-12) var(--space-14);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-input);
+  background: var(--field);
+  font-size: var(--type-name);
+  line-height: 1.45;
+}
+
+.entry textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.entry .primary {
+  flex: none;
+  min-width: var(--declare-width);
+  border-radius: var(--radius-input);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--type-label);
+  color: var(--text-faint);
 }
 
 /* The state pane */
 
 .state-pane {
   grid-area: state;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
   overflow-y: auto;
-  padding: var(--space-4);
-  border-left: 1px solid var(--color-border);
-  background: var(--color-surface);
+  padding: var(--space-24) var(--space-20);
+  border-left: 1px solid var(--line);
+  background: var(--pane);
 }
 
-.state-pane h2 {
-  margin: 0 0 var(--space-1);
-  font-size: var(--font-size-heading);
+.state-pane > section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
 }
 
-.state-pane ul,
-.state-pane ol {
-  list-style: none;
+.state-pane .head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.state-pane .head > span {
+  font-size: var(--type-small);
+  color: var(--text-muted);
+}
+
+.state-pane ol,
+.state-pane ul {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   padding: 0;
-}
-
-.encounter {
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.encounter .round {
-  margin: 0 0 var(--space-2);
-  color: var(--color-text-muted);
+  list-style: none;
 }
 
 .turn-order {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--space-4);
 }
 
 .turn-order li {
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-size: var(--font-size-small);
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  min-height: var(--pill-height);
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-row);
+  color: var(--text-secondary);
 }
 
-.turn-order li.opponent {
-  color: var(--color-danger);
-}
-
-.turn-order li[aria-current='true'] {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+.turn-order li[aria-current] {
+  background: var(--accent-tint);
+  color: var(--text);
   font-weight: 600;
 }
 
+.turn-order .position {
+  width: var(--space-16);
+  font-size: var(--type-label);
+  color: var(--text-faint);
+}
+
+.turn-order .name {
+  flex: 1;
+}
+
+.turn-order .tag {
+  color: var(--accent);
+}
+
+.turn-order .opponent {
+  font-size: var(--type-label);
+  color: var(--text-faint);
+}
+
 .cards {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-12);
 }
 
 .card {
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-left: var(--border-marker) solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface-raised);
-}
-
-.card[aria-current='true'] {
-  border-left-color: var(--color-accent);
-}
-
-.card .heading {
   display: flex;
-  justify-content: space-between;
-  gap: var(--space-2);
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: var(--space-14) var(--space-16);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--card);
+}
+
+.card[aria-current] {
+  border-color: var(--accent);
+  background: var(--acting-card);
+}
+
+.card.down {
+  opacity: 0.78;
+}
+
+.card .top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.card .who {
+  flex: 1;
+  min-width: 0;
+}
+
+.card .line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.card .name {
+  font-size: var(--type-name);
+  font-weight: 600;
+}
+
+.card .badge {
+  padding: var(--padding-badge);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--type-badge);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card .class {
+  font-size: var(--type-small);
+  color: var(--text-muted);
+}
+
+/* The armour class, on a shield. */
+.armour-class {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--shield-width);
+  height: var(--shield-height);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-shield);
+  background: var(--sunken);
+}
+
+.armour-class small {
+  font-size: var(--type-badge);
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.armour-class b {
+  font-size: var(--type-number);
+  line-height: 1.2;
+}
+
+.hit-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.hit-points .numbers {
+  display: flex;
   align-items: baseline;
-}
-
-.card .class,
-.card .armour-class {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-small);
-}
-
-.card .hit-points {
-  display: flex;
   justify-content: space-between;
-  margin-top: var(--space-2);
+  font-size: var(--type-small);
   font-variant-numeric: tabular-nums;
 }
 
-.card .temporary {
-  color: var(--color-temporary);
+.hit-points .numbers > span:first-child,
+.hit-points .max {
+  color: var(--text-muted);
 }
 
-.card .bar {
-  height: var(--hit-point-bar-height);
-  margin-top: var(--space-1);
-  border-radius: var(--radius);
-  background: var(--color-bg);
+.hit-points strong {
+  font-size: var(--type-name);
+}
+
+.temporary {
+  color: var(--hp-temp);
+  font-weight: 600;
+}
+
+.bar {
+  display: flex;
+  height: var(--bar-height);
+  border-radius: calc(var(--bar-height) / 2);
+  background: var(--hp-track);
   overflow: hidden;
 }
 
-.card .bar > div {
-  height: 100%;
-  background: var(--color-hit-points);
+.bar .current {
+  background: var(--hp-ok);
 }
 
-.card .conditions {
+.bar.low .current {
+  background: var(--hp-low);
+}
+
+.bar .temporary-segment {
+  background: var(--hp-temp);
+}
+
+.conditions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
-  margin: var(--space-2) 0 0;
+  gap: var(--space-6);
+  margin: 0;
 }
 
-.card .conditions span {
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-size: var(--font-size-small);
+.conditions span {
+  padding: var(--padding-condition);
+  border: 1px solid var(--condition-line);
+  border-radius: var(--radius-pill);
+  background: var(--condition-bg);
+  color: var(--text-control);
+  font-size: var(--type-label);
+  font-weight: 500;
 }
 
-/* A character at 0 hit points: dying, stable or dead. */
-.card.down {
-  border-color: var(--color-danger);
-  background: var(--color-surface);
+/* The compact strip, below 1024 px */
+
+.state-strip {
+  grid-area: strip;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-10) var(--space-16);
+  border-bottom: 1px solid var(--line);
+  background: var(--pane);
 }
 
-.card.down .name {
-  text-decoration: line-through;
+.state-strip .summary {
+  margin: 0;
+  font-size: var(--type-small);
+  color: var(--text-muted);
 }
 
-.card.down .hit-points {
-  color: var(--color-danger);
+.state-strip .summary strong {
+  color: var(--text);
+}
+
+.state-strip ul {
+  display: flex;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  list-style: none;
+  overflow-x: auto;
+}
+
+.state-strip li {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--pill-height);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  font-size: var(--type-control);
+  font-variant-numeric: tabular-nums;
+}
+
+.state-strip li[aria-current] {
+  border-color: var(--accent);
+  background: var(--acting-card);
+}
+
+.state-strip li.down {
+  opacity: 0.78;
 }
 
 /* The party dialog */
 
 .party-dialog {
-  max-width: min(60rem, calc(100vw - 2 * var(--space-4)));
-  max-height: calc(100dvh - 2 * var(--space-4));
-  padding: var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
+  width: calc(100% - 2 * var(--space-16));
+  max-width: var(--dialog-width);
+  max-height: calc(100dvh - 2 * var(--space-16));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-dialog);
+  background: var(--dialog);
+  box-shadow: var(--shadow-dialog);
+  color: var(--text);
 }
 
 .party-dialog::backdrop {
-  background: var(--color-backdrop);
+  background: var(--backdrop);
+}
+
+.party-form .head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-16);
+  padding: var(--space-24) var(--space-28) var(--space-20);
+  border-bottom: 1px solid var(--line);
+}
+
+.party-form .intro {
+  display: flex;
+  flex: 1 1 320px;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .party-form h2 {
-  margin-top: 0;
+  margin: 0;
+  font-size: var(--type-title);
+  font-weight: 600;
 }
 
-.party-form fieldset {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: flex-end;
-  margin: 0 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+.party-form .intro p,
+.party-form .foot p {
+  margin: 0;
+  font-size: var(--type-control);
+  color: var(--text-muted);
 }
 
-.party-form label {
+/* Narrower than the rows, they scroll sideways in their box. */
+.party-form .rows-box {
+  overflow-x: auto;
+  padding: var(--space-8) var(--space-28) var(--space-4);
+}
+
+.party-form .rows {
+  min-width: var(--dialog-rows-min);
+}
+
+.party-form .grid {
+  display: grid;
+  grid-template-columns: 2fr 1.6fr repeat(5, minmax(0, 1fr)) var(--touch);
+  gap: var(--space-10);
+  align-items: start;
+}
+
+.party-form .column-heads {
+  padding: var(--space-12) 0 var(--space-8);
+  color: var(--text-muted);
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.party-form .row {
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.party-form .cell {
   display: flex;
   flex-direction: column;
-  font-size: var(--font-size-small);
+  gap: var(--space-4);
 }
 
 .party-form input {
-  width: 6rem;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--field);
+}
+
+.party-form input::placeholder {
+  color: var(--text-faint);
+}
+
+.party-form input[aria-invalid='true'] {
+  border-color: var(--text-error);
+}
+
+.party-form input.number {
+  text-align: center;
+}
+
+.party-form input.name {
+  font-weight: 600;
 }
 
 .party-form .error {
-  color: var(--color-danger);
-  max-width: 12rem;
+  color: var(--text-error);
+  font-size: var(--type-label);
+}
+
+.party-form .remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch);
+  height: var(--touch);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.party-form .add {
+  padding: var(--space-12) 0 var(--space-8);
+  border-top: 1px solid var(--line-subtle);
+}
+
+.party-form .add button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch);
+  padding: 0 var(--space-14);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-control);
+  font-size: var(--type-control);
+}
+
+.party-form .messages {
+  padding: 0 var(--space-28);
+}
+
+.party-form .foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-18) var(--space-28) var(--space-22);
+  border-top: 1px solid var(--line);
+}
+
+.party-form .foot p {
+  flex: 1 1 280px;
+  font-size: var(--type-small);
+}
+
+/* Narrower screens put a compact strip of the state above the story instead
+   of the pane beside it, so the state stays in view on a tablet held
+   upright. Last in the file, so it overrides the rules above. */
+@media (width < 1024px) {
+  .table {
+    grid-template-areas:
+      'header'
+      'strip'
+      'story';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .state-pane {
+    display: none;
+  }
+
+  .state-strip {
+    display: flex;
+  }
 }

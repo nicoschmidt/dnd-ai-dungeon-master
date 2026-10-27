@@ -1,5 +1,6 @@
 import type {
   Character,
+  Combatant,
   DeclaredAction,
   Encounter,
   TableError,
@@ -66,9 +67,15 @@ export function applyEvent(state: TableState, event: TableEvent): TableState {
   }
 }
 
+// Whose turn it is in a running encounter, character or opponent; null before
+// the turn order is fixed and once the encounter has ended.
+export function currentCombatant(encounter: Encounter | null): Combatant | null {
+  if (!encounter || encounter.current_turn === null || encounter.outcome) return null
+  return encounter.turn_order[encounter.current_turn] ?? null
+}
+
 // Whose turn it is, when it is a character's: the one the input preselects.
 export function actingCharacterId(encounter: Encounter | null): string | null {
-  if (!encounter || encounter.current_turn === null || encounter.outcome) return null
-  const combatant = encounter.turn_order[encounter.current_turn]
+  const combatant = currentCombatant(encounter)
   return combatant?.kind === 'character' ? combatant.id : null
 }

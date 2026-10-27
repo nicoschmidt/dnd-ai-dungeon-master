@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 
 import type { Character } from './contract/index.ts'
+import { Avatar } from './party/Avatar.tsx'
 import type { Turn } from './stream/tableState.ts'
 
 interface Props {
@@ -36,19 +37,25 @@ export function Narration({ turns, party }: Props) {
       aria-live="polite"
       onScroll={noteWhereTheReaderIs}
     >
-      {turns.length === 0 && <p className="empty">The story begins with what you do.</p>}
-      {turns.map((turn) => {
-        const speaker = party.find((c) => c.id === turn.action.character_id)
-        return (
-          <article key={turn.id}>
-            <p className="declared">
-              {speaker ? `${speaker.name}: ` : ''}
-              {turn.action.text}
-            </p>
-            <p className="told">{turn.narration}</p>
-          </article>
-        )
-      })}
+      <div className="column">
+        {turns.length === 0 && <p className="empty">The story begins with what you do.</p>}
+        {turns.map((turn) => {
+          const speaker = party.find((c) => c.id === turn.action.character_id)
+          return (
+            <article key={turn.id} className="turn">
+              <div className="declared">
+                {speaker && <Avatar character={speaker} party={party} small />}
+                <p>
+                  {speaker && <strong>{speaker.name}</strong>}
+                  {speaker && ' — '}
+                  {turn.action.text}
+                </p>
+              </div>
+              <p className="told">{turn.narration}</p>
+            </article>
+          )
+        })}
+      </div>
     </section>
   )
 }

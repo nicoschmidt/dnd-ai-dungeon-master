@@ -56,10 +56,16 @@ function turnOrder(): HTMLElement[] {
   return within(screen.getByRole('list', { name: 'Turn order' })).getAllByRole('listitem')
 }
 
+function nameOf(item: HTMLElement): string {
+  return item.querySelector('.name')?.textContent ?? ''
+}
+
 function marked(items: HTMLElement[]): string[] {
-  return items
-    .filter((item) => item.getAttribute('aria-current') === 'true')
-    .map((item) => item.querySelector('.name')?.textContent ?? item.textContent ?? '')
+  return items.filter((item) => item.hasAttribute('aria-current')).map(nameOf)
+}
+
+function segment(card: HTMLElement, name: string): string {
+  return (card.querySelector(`.bar > .${name}`) as HTMLElement).style.width
 }
 
 describe('StatusPanel', () => {
@@ -67,28 +73,32 @@ describe('StatusPanel', () => {
     renderPanel(stateFrom({ type: 'party_updated', party: [brann, mira] }))
 
     const [first, second] = cards()
-    expect(within(first).getByText('Brann')).toBeTruthy()
-    expect(within(first).getByText('Fighter 3')).toBeTruthy()
-    expect(within(first).getByText('AC 16')).toBeTruthy()
-    expect(within(first).getByText('17 / 28 HP')).toBeTruthy()
-    expect(within(first).getByText('+5 temporary')).toBeTruthy()
+    expect(nameOf(first)).toBe('Brann')
+    expect(within(first).getByText('Fighter · level 3')).toBeTruthy()
+    expect(within(first).getByTitle('Armour class').textContent).toBe('AC16')
+    expect(within(first).getByText('17').tagName).toBe('STRONG')
+    expect(within(first).getByText('/ 28')).toBeTruthy()
+    expect(within(first).getByText('+5 temp.')).toBeTruthy()
     const conditions = within(first).getByLabelText('Conditions').children
     expect([...conditions].map((c) => c.textContent)).toEqual(['prone', 'poisoned'])
-    expect(within(second).getByText('9 / 9 HP')).toBeTruthy()
-    expect(within(second).queryByText(/temporary/)).toBeNull()
+    expect(within(second).getByText('/ 9')).toBeTruthy()
+    expect(within(second).queryByText(/temp\./)).toBeNull()
     expect(within(second).queryByLabelText('Conditions')).toBeNull()
   })
 
-  it('draws the hit point bar from current and maximum hit points', () => {
+  it('draws the hit point bar with a segment for temporary hit points', () => {
     renderPanel(stateFrom({ type: 'party_updated', party: [brann, mira] }))
 
     const [first, second] = cards()
-    const fill = (card: HTMLElement) => (card.querySelector('.bar > div') as HTMLElement).style.width
-    expect(fill(first)).toBe(`${(17 / 28) * 100}%`)
-    expect(fill(second)).toBe('100%')
+    expect(segment(first, 'current')).toBe(`${(17 / 33) * 100}%`)
+    expect(segment(first, 'temporary-segment')).toBe(`${(5 / 33) * 100}%`)
+    expect(segment(second, 'current')).toBe('100%')
+    expect(within(first).getByRole('img').getAttribute('aria-label')).toBe(
+      '17 of 28 hit points, 5 temporary',
+    )
   })
 
-  it('sets a character at 0 hit points apart', () => {
+  it('sets a character at 0 hit points apart, with their condition in view', () => {
     renderPanel(
       stateFrom({
         type: 'party_updated',
@@ -98,6 +108,7 @@ describe('StatusPanel', () => {
 
     const [first, second] = cards()
     expect(first.classList).toContain('down')
+    expect(within(first).getByText('unconscious')).toBeTruthy()
     expect(second.classList).not.toContain('down')
   })
 
@@ -110,11 +121,11 @@ describe('StatusPanel', () => {
     )
 
     expect(cards()).toHaveLength(1)
-    expect(screen.getByText('4 / 28 HP')).toBeTruthy()
+    expect(screen.getByText('4')).toBeTruthy()
     expect(screen.queryByText('prone')).toBeNull()
   })
 
-  it('shows the opponent, the round and the turn order from encounter_updated', () => {
+  it('shows the round and the turn order from encounter_updated', () => {
     renderPanel(
       stateFrom(
         { type: 'party_updated', party: [brann, mira] },
@@ -122,10 +133,15 @@ describe('StatusPanel', () => {
       ),
     )
 
-    const encounter = within(screen.getByRole('region', { name: 'Encounter' }))
-    expect(encounter.getByRole('heading').textContent).toBe('Ogre')
-    expect(encounter.getByText('Round 2')).toBeTruthy()
-    expect(turnOrder().map((item) => item.textContent)).toEqual(['Brann', 'Ogre', 'Mira'])
+    const fight = within(screen.getByRole('region', { name: 'Fight' }))
+    expect(fight.getByText('Round 2')).toBeTruthy()
+    expect(turnOrder().map(nameOf)).toEqual(['Brann', 'Ogre', 'Mira'])
+  })
+
+  it('shows the opponent by name only, marked as the opponent', () => {
+    renderPanel(stateFrom({ type: 'encounter_updated', encounter: ogre }))
+
+    expect(turnOrder()[1].textContent).toBe('2Ogreopponent')
   })
 
   it('marks the current combatant in the turn order, and their card', () => {
@@ -137,10 +153,13 @@ describe('StatusPanel', () => {
     )
 
     expect(marked(turnOrder())).toEqual(['Mira'])
+    expect(within(turnOrder()[2]).getByText('on turn')).toBeTruthy()
     expect(marked(cards())).toEqual(['Mira'])
+    expect(within(cards()[1]).getByText('on turn')).toBeTruthy()
+    expect(within(cards()[0]).queryByText('on turn')).toBeNull()
   })
 
-  it("marks the opponent in the turn order on its turn, and no card", () => {
+  it('marks the opponent in the turn order on its turn, and no card', () => {
     renderPanel(
       stateFrom(
         { type: 'party_updated', party: [brann, mira] },
@@ -160,7 +179,7 @@ describe('StatusPanel', () => {
       ),
     )
 
-    expect(screen.getByText('The encounter has ended.')).toBeTruthy()
+    expect(screen.getByText('Ended')).toBeTruthy()
     expect(marked(turnOrder())).toEqual([])
     expect(marked(cards())).toEqual([])
   })
