@@ -14,14 +14,16 @@ interface Props {
   onClose: () => void
 }
 
-const FIELDS: { key: keyof CharacterRow; label: string; numeric: boolean }[] = [
-  { key: 'name', label: 'Name', numeric: false },
-  { key: 'character_class', label: 'Class', numeric: false },
-  { key: 'level', label: 'Level', numeric: true },
-  { key: 'armour_class', label: 'AC', numeric: true },
-  { key: 'max_hit_points', label: 'Max HP', numeric: true },
-  { key: 'current_hit_points', label: 'Current HP', numeric: true },
-  { key: 'temporary_hit_points', label: 'Temp HP', numeric: true },
+// The columns of the party grid: a short heading above, a full name for
+// assistive technology on every input.
+const FIELDS: { key: keyof CharacterRow; heading: string; label: string; numeric: boolean }[] = [
+  { key: 'name', heading: 'Name', label: 'Name', numeric: false },
+  { key: 'character_class', heading: 'Class', label: 'Class', numeric: false },
+  { key: 'level', heading: 'Level', label: 'Level', numeric: true },
+  { key: 'armour_class', heading: 'AC', label: 'Armour class', numeric: true },
+  { key: 'max_hit_points', heading: 'Max HP', label: 'Maximum hit points', numeric: true },
+  { key: 'current_hit_points', heading: 'Current HP', label: 'Current hit points', numeric: true },
+  { key: 'temporary_hit_points', heading: 'Temp HP', label: 'Temporary hit points', numeric: true },
 ]
 
 // Messages from a rejected PUT: FastAPI's validation list, or a plain detail.
@@ -74,47 +76,91 @@ export function PartyForm({ party, onClose }: Props) {
     }
   }
 
+  const messages = [...(validation?.party ?? []), ...serverErrors]
+
   return (
     <form className="party-form" onSubmit={save} noValidate>
-      <h2>The party</h2>
-      {rows.map((row, index) => (
-        <fieldset key={index}>
-          <legend>Character {index + 1}</legend>
-          {FIELDS.map(({ key, label, numeric }) => {
-            const error = validation?.rows[index]?.[key]
-            return (
-              <label key={key}>
-                {label}
-                <input
-                  value={row[key]}
-                  inputMode={numeric ? 'numeric' : undefined}
-                  placeholder={key === 'current_hit_points' ? 'max' : undefined}
-                  aria-invalid={error ? 'true' : undefined}
-                  onChange={(event) => update(index, key, event.target.value)}
-                />
-                {error && <span className="error">{error}</span>}
-              </label>
-            )
-          })}
-          <button type="button" onClick={() => setRows(rows.filter((_, i) => i !== index))}>
-            Remove
-          </button>
-        </fieldset>
-      ))}
-      {[...(validation?.party ?? []), ...serverErrors].map((message) => (
-        <p key={message} role="alert">
-          {message}
-        </p>
-      ))}
-      <button type="button" onClick={() => setRows([...rows, emptyRow()])}>
-        Add a character
-      </button>{' '}
-      <button type="submit" disabled={saving}>
-        Save the party
-      </button>{' '}
-      <button type="button" onClick={onClose}>
-        Cancel
-      </button>
+      <div className="head">
+        <div className="intro">
+          <h2>The party</h2>
+          <p>Only what the system needs for the fight. Everything else stays on your sheets.</p>
+        </div>
+      </div>
+      <div className="rows-box">
+        <div className="rows">
+          <div className="grid column-heads" aria-hidden="true">
+            {FIELDS.map(({ key, heading }) => (
+              <span key={key}>{heading}</span>
+            ))}
+            <span />
+          </div>
+          {rows.map((row, index) => (
+            <div className="grid row" role="group" aria-label={`Character ${index + 1}`} key={index}>
+              {FIELDS.map(({ key, label, numeric }) => {
+                const error = validation?.rows[index]?.[key]
+                const errorId = `party-${index}-${key}-error`
+                return (
+                  <div className="cell" key={key}>
+                    <input
+                      className={numeric ? 'number' : key === 'name' ? 'name' : undefined}
+                      aria-label={label}
+                      value={row[key]}
+                      inputMode={numeric ? 'numeric' : undefined}
+                      placeholder={key === 'current_hit_points' ? 'max' : undefined}
+                      aria-invalid={error ? 'true' : undefined}
+                      aria-describedby={error ? errorId : undefined}
+                      onChange={(event) => update(index, key, event.target.value)}
+                    />
+                    {error && (
+                      <span id={errorId} className="error">
+                        {error}
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
+              <button
+                type="button"
+                className="remove"
+                aria-label={`Remove ${row.name.trim() || `character ${index + 1}`}`}
+                onClick={() => setRows(rows.filter((_, i) => i !== index))}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            </div>
+          ))}
+          <div className="add">
+            <button type="button" onClick={() => setRows([...rows, emptyRow()])}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Add a character
+            </button>
+          </div>
+        </div>
+      </div>
+      {messages.length > 0 && (
+        <div className="messages">
+          {messages.map((message) => (
+            <p key={message} role="alert">
+              {message}
+            </p>
+          ))}
+        </div>
+      )}
+      <div className="foot">
+        <p>Leave current HP empty for full hit points.</p>
+        <button type="button" className="secondary" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="submit" className="primary" disabled={saving}>
+          Save the party
+        </button>
+      </div>
     </form>
   )
 }

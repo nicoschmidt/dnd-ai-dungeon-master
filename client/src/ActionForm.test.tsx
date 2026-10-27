@@ -40,17 +40,28 @@ function renderForm(
   return { ...view, onDeclare }
 }
 
-// The name on the pressed button: the character the action will be sent with.
+function actors() {
+  return within(screen.getByRole('radiogroup', { name: 'Who acts?' })).getAllByRole('radio')
+}
+
+// The name on the checked radio, without its tag: who the action is sent with.
 function chosen(): string {
-  const actors = within(screen.getByRole('group', { name: 'Acting character' }))
-  return actors.getByRole('button', { pressed: true }).textContent ?? ''
+  const checked = actors().find((radio) => radio.getAttribute('aria-checked') === 'true')
+  return checked?.firstChild?.textContent ?? ''
 }
 
 function markedAsTheirTurn(): string[] {
-  return screen
-    .getAllByRole('button')
-    .filter((button) => button.getAttribute('aria-current') === 'true')
-    .map((button) => button.textContent ?? '')
+  return actors()
+    .filter((radio) => within(radio).queryByText('on turn'))
+    .map((radio) => radio.firstChild?.textContent ?? '')
+}
+
+function actor(name: string): HTMLElement {
+  return actors().find((radio) => radio.firstChild?.textContent === name)!
+}
+
+function type(text: string) {
+  fireEvent.change(screen.getByLabelText('Declared action'), { target: { value: text } })
 }
 
 describe('ActionForm', () => {
@@ -60,22 +71,17 @@ describe('ActionForm', () => {
     expect(chosen()).toBe('Mira')
   })
 
-  it('offers one button per character and one for the whole table', () => {
+  it('offers one choice per character and one for the whole table', () => {
     renderForm(null)
 
-    const actors = within(screen.getByRole('group', { name: 'Acting character' }))
-    expect(actors.getAllByRole('button').map((b) => b.textContent)).toEqual([
-      'The table',
-      'Brann',
-      'Mira',
-    ])
+    expect(actors().map((radio) => radio.textContent)).toEqual(['The table', 'Brann', 'Mira'])
   })
 
   it('marks the character whose turn it is, also when the table picks someone else', () => {
     renderForm(turnOf(0))
     expect(markedAsTheirTurn()).toEqual(['Brann'])
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mira' }))
+    fireEvent.click(actor('Mira'))
     expect(chosen()).toBe('Mira')
     expect(markedAsTheirTurn()).toEqual(['Brann'])
   })
@@ -97,12 +103,27 @@ describe('ActionForm', () => {
     expect(chosen()).toBe('Mira')
   })
 
+  it('moves the choice with the arrow keys, as a radio group does', () => {
+    renderForm(turnOf(0))
+
+    fireEvent.keyDown(actor('Brann'), { key: 'ArrowRight' })
+    expect(chosen()).toBe('Mira')
+    expect(document.activeElement).toBe(actor('Mira'))
+
+    fireEvent.keyDown(actor('Mira'), { key: 'ArrowRight' })
+    expect(chosen()).toBe('The table')
+  })
+
+  it('lets only the chosen one be reached with Tab', () => {
+    renderForm(turnOf(2))
+
+    expect(actors().map((radio) => radio.tabIndex)).toEqual([-1, -1, 0])
+  })
+
   it('sends the acting character with the declared action', async () => {
     const { onDeclare } = renderForm(turnOf(0))
 
-    fireEvent.change(screen.getByLabelText('Declared action'), {
-      target: { value: 'I attack the ogre, 17' },
-    })
+    type('I attack the ogre, 17')
     fireEvent.submit(screen.getByLabelText('Declared action'))
 
     await vi.waitFor(() => expect(onDeclare).toHaveBeenCalled())
@@ -115,11 +136,44 @@ describe('ActionForm', () => {
   it('lets the table pick someone else', async () => {
     const { onDeclare } = renderForm(turnOf(0))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mira' }))
-    fireEvent.change(screen.getByLabelText('Declared action'), { target: { value: 'I help' } })
+    fireEvent.click(actor('Mira'))
+    type('I help')
     fireEvent.submit(screen.getByLabelText('Declared action'))
 
     await vi.waitFor(() => expect(onDeclare).toHaveBeenCalled())
     expect(onDeclare.mock.calls[0][0].character_id).toBe('mira')
+  })
+
+  it('declares on Enter', async () => {
+    const { onDeclare } = renderForm(turnOf(0))
+
+    type('I attack the ogre, 17')
+    fireEvent.keyDown(screen.getByLabelText('Declared action'), { key: 'Enter' })
+
+    await vi.waitFor(() => expect(onDeclare).toHaveBeenCalled())
+    expect(onDeclare.mock.calls[0][0].text).toBe('I attack the ogre, 17')
+  })
+
+  it('does not declare on Shift+Enter, which adds a line', () => {
+    const { onDeclare } = renderForm(turnOf(0))
+
+    type('I attack the ogre')
+    const kept = fireEvent.keyDown(screen.getByLabelText('Declared action'), {
+      key: 'Enter',
+      shiftKey: true,
+    })
+
+    expect(kept).toBe(true)
+    expect(onDeclare).not.toHaveBeenCalled()
+  })
+
+  it('does not declare on Enter while the dungeon master is still answering', () => {
+    const onDeclare = vi.fn(async () => true)
+    render(<ActionForm party={party} encounter={turnOf(0)} busy onDeclare={onDeclare} />)
+
+    type('I attack again')
+    fireEvent.keyDown(screen.getByLabelText('Declared action'), { key: 'Enter' })
+
+    expect(onDeclare).not.toHaveBeenCalled()
   })
 })

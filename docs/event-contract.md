@@ -55,8 +55,10 @@ The status panel (`client/src/party/StatusPanel.tsx`) is the table screen's
 state pane, beside the narration. It renders the party and the encounter from
 that state, which is to say from `party_updated` and `encounter_updated` and
 nothing else: one card per character, and the opponent by name with the turn
-order, whoever acts now marked. The input below the narration preselects and
-marks the character whose turn `encounter_updated` says it is.
+order, whoever acts now marked. Below 1024 px a compact strip above the
+narration (`client/src/party/StateStrip.tsx`) takes its place, rendered from
+the same state. The input below the narration preselects and marks the
+character whose turn `encounter_updated` says it is.
 
 ## Events
 
