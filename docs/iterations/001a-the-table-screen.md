@@ -32,6 +32,9 @@ Epic: #68.
   for the narration and every string of the client
 - #65 — save the party to a file, and load it again; the file is a
   `PartyEntry` of the [event contract](../event-contract.md)
+- #72 — dice shortcuts beside the input: enter a roll, or let the screen roll
+  it. Added during the iteration, after #63 had shipped; it moves the non-goal
+  "Digital dice" out of the [vision](../vision.md)
 
 The layout follows a mockup the maintainer approved, kept outside the
 repository; #63 states its substance as acceptance criteria.

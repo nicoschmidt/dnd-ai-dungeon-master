@@ -1,6 +1,8 @@
 import { type FormEvent, type KeyboardEvent, useRef, useState } from 'react'
 
 import type { Character, DeclaredAction, Encounter } from './contract/index.ts'
+import { DiceBlock } from './dice/DiceBlock.tsx'
+import { appendLine } from './dice/dice.ts'
 import { actingCharacterId } from './stream/tableState.ts'
 
 interface Props {
@@ -21,6 +23,7 @@ export function ActionForm({ party, encounter, busy, onDeclare }: Props) {
   const [text, setText] = useState('')
   const [selection, setSelection] = useState({ acting, chosen: acting ?? '' })
   const actorButtons = useRef<(HTMLButtonElement | null)[]>([])
+  const textField = useRef<HTMLTextAreaElement>(null)
 
   // A new turn preselects its character, replacing whatever was picked before.
   if (selection.acting !== acting) {
@@ -45,6 +48,13 @@ export function ActionForm({ party, encounter, busy, onDeclare }: Props) {
       event.preventDefault()
       void declare()
     }
+  }
+
+  // A roll from the dice block joins the text, on a line of its own, and the
+  // text field takes the focus so it can be changed or declared.
+  function addRoll(line: string) {
+    setText((current) => appendLine(current, line))
+    textField.current?.focus()
   }
 
   // The arrow keys move the choice within the group, as in any radio group.
@@ -88,18 +98,23 @@ export function ActionForm({ party, encounter, busy, onDeclare }: Props) {
           ))}
         </div>
         <div className="entry">
-          <textarea
-            rows={2}
-            aria-label="Declared action"
-            aria-describedby="action-hint"
-            placeholder="What do you do? Include what you rolled."
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            onKeyDown={onTextKey}
-          />
-          <button type="submit" className="primary" disabled={busy || !text.trim()}>
-            Declare
-          </button>
+          <div className="compose">
+            <textarea
+              ref={textField}
+              rows={2}
+              aria-label="Declared action"
+              aria-describedby="action-hint"
+              placeholder="What do you do? Include what you rolled."
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={onTextKey}
+            />
+            <button type="submit" className="primary" disabled={busy || !text.trim()}>
+              Declare
+            </button>
+          </div>
+          {/* A roll belongs to whoever acts: a new choice starts the block afresh. */}
+          <DiceBlock key={chosen} disabled={chosen === ''} onLine={addRoll} />
         </div>
         <p id="action-hint" className="hint">
           Enter declares · Shift+Enter for a new line

@@ -167,6 +167,66 @@ describe('ActionForm', () => {
     expect(onDeclare).not.toHaveBeenCalled()
   })
 
+  it('appends a roll from the dice block to the text, and focuses the text', () => {
+    renderForm(turnOf(0))
+    const field = screen.getByLabelText('Declared action') as HTMLTextAreaElement
+    type('I attack the ogre.')
+
+    const dice = within(screen.getByRole('group', { name: 'Dice' }))
+    fireEvent.click(dice.getByRole('button', { name: 'd20' }))
+    fireEvent.click(dice.getByRole('button', { name: '14' }))
+    fireEvent.click(dice.getByRole('button', { name: '+5' }))
+
+    expect(field.value).toBe('I attack the ogre.\nd20: 14 + 5 = 19')
+    expect(document.activeElement).toBe(field)
+  })
+
+  it('declares the roll only on Declare', async () => {
+    const { onDeclare } = renderForm(turnOf(0))
+
+    const dice = within(screen.getByRole('group', { name: 'Dice' }))
+    fireEvent.click(dice.getByRole('button', { name: 'd20' }))
+    fireEvent.click(dice.getByRole('button', { name: '17' }))
+    fireEvent.click(dice.getByRole('button', { name: '+2' }))
+    expect(onDeclare).not.toHaveBeenCalled()
+
+    fireEvent.submit(screen.getByLabelText('Declared action'))
+    await vi.waitFor(() => expect(onDeclare).toHaveBeenCalled())
+    expect(onDeclare.mock.calls[0][0]).toEqual<DeclaredAction>({
+      text: 'd20: 17 + 2 = 19',
+      character_id: 'brann',
+    })
+  })
+
+  it('offers the dice to a chosen character before the turn order is fixed', () => {
+    renderForm({ ...turnOf(0), round: 0, current_turn: null })
+
+    fireEvent.click(actor('Mira'))
+
+    const d20 = within(screen.getByRole('group', { name: 'Dice' })).getByRole('button', {
+      name: 'd20',
+    })
+    expect((d20 as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('disables the dice for the whole table', () => {
+    renderForm(turnOf(1))
+
+    const dice = within(screen.getByRole('group', { name: 'Dice' })).getAllByRole('button')
+    expect(dice.every((button) => (button as HTMLButtonElement).disabled)).toBe(true)
+  })
+
+  it('starts the dice afresh when someone else is chosen', () => {
+    renderForm(turnOf(0))
+
+    const dice = () => within(screen.getByRole('group', { name: 'Dice' }))
+    fireEvent.click(dice().getByRole('button', { name: 'd20' }))
+    fireEvent.click(actor('Mira'))
+
+    expect(dice().getByRole('button', { name: 'd20' })).toBeTruthy()
+    expect(dice().queryByRole('button', { name: '14' })).toBeNull()
+  })
+
   it('does not declare on Enter while the dungeon master is still answering', () => {
     const onDeclare = vi.fn(async () => true)
     render(<ActionForm party={party} encounter={turnOf(0)} busy onDeclare={onDeclare} />)

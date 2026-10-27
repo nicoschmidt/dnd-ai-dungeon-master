@@ -24,7 +24,7 @@ master view, never on the table's screen
 ```mermaid
 flowchart TD
     subgraph table["At the table"]
-        players["Players<br/>pen, paper, physical dice"]
+        players["Players<br/>pen, paper, dice"]
         client["Web client<br/>narration log · input · party status<br/>(later: map grid)"]
         gmview["Game master view (/gm)<br/>opponent · rolls · tool calls · plan"]
     end
@@ -70,7 +70,10 @@ flowchart TD
 TypeScript ([ADR-0005](adr/0005-concrete-web-stack.md)). In the first iteration
 it renders narration and takes input; the party status panel follows early, the
 map grid later. It renders only what the backend sends it, which is how hidden
-information stays hidden. It receives state, never markup, which is what keeps
+information stays hidden. A dice block in the input turns a roll into a line
+of the declared action's text — a roll made at the table, or one the client
+makes at a player's click; the backend cannot tell them apart and never rolls
+for a player. It receives state, never markup, which is what keeps
 it replaceable — by a client on a tablet, or eventually a native one — without
 the backend changing.
 
