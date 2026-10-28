@@ -9,9 +9,16 @@ import '@fontsource/inter/700.css'
 import '@fontsource/literata/400.css'
 import './index.css'
 import App from './App.tsx'
+import { StringsContext, dictionary, tableLanguage } from './language/strings.ts'
+
+// The language comes first: nothing is rendered before the table knows it.
+const language = await tableLanguage()
+document.documentElement.lang = language
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <StringsContext value={dictionary(language)}>
+      <App />
+    </StringsContext>
   </StrictMode>,
 )

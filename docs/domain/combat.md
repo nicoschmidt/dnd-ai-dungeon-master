@@ -300,9 +300,12 @@ itself instead of narrating something the state does not support.
 
 ## Narration language
 
-The table plays in German by default; the narration language is a configuration
-value. Prompts, tool names, the journal and everything in this repository are
-English.
+The table plays in German by default. One configuration value, `DM_LANGUAGE`
+(`de` or `en`), sets the language of the narration and of everything the
+screen shows, condition names included; it is fixed for the session. Prompts,
+tool names, the journal and everything in this repository are English. The
+dice are named as the table names them: a roll reaches the model as
+`W20: 14 + 5 = 19` at a German table.
 
 ## Deliberately not in iteration 001
 

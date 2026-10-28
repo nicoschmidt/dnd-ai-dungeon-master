@@ -27,12 +27,13 @@ export function formatModifier(modifier: number): string {
   return modifier < 0 ? `−${-modifier}` : `+${modifier}`
 }
 
-// The line a roll adds to the declared action. It shows the face as well as
-// the total, so a natural 1 or 20 is plain to the dungeon master.
-export function rollLine(sides: number, face: number, modifier: number): string {
-  if (modifier === 0) return `d${sides}: ${face}`
+// The line a roll adds to the declared action, for a die named in the
+// table's language: d20, W20. It shows the face as well as the total, so a
+// natural 1 or 20 is plain to the dungeon master.
+export function rollLine(die: string, face: number, modifier: number): string {
+  if (modifier === 0) return `${die}: ${face}`
   const sign = modifier > 0 ? '+' : '−'
-  return `d${sides}: ${face} ${sign} ${Math.abs(modifier)} = ${face + modifier}`
+  return `${die}: ${face} ${sign} ${Math.abs(modifier)} = ${face + modifier}`
 }
 
 // Appends a line to the text of the action, on a line of its own.

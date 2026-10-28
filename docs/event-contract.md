@@ -24,6 +24,7 @@ that every existing reader can ignore does not change it.
 | --- | --- |
 | `GET /api/session/stream` | The table's event stream, `text/event-stream`. Opened once by the page and kept open. |
 | `POST /api/session/actions` | Declare an action. Body: a `DeclaredAction`. Answers `202` with the `turn_id`; everything the turn produces arrives on the stream. `409` while a turn is still running — interrupting the dungeon master is deliberately not possible (ADR-0005). `422` for a body that does not fit, or a `character_id` that is not in the party. |
+| `GET /api/language` | The table's language, `{"language": "de" \| "en"}`, as `DM_LANGUAGE` configures it. The page asks once, before it renders anything; a page that cannot reach it starts in `de`. Not part of the generated contract: it is configuration, not an event. |
 | `PUT /api/session/party` | Enter the party. Body: a `PartyEntry`. Replaces the whole party, answers `200` with it, and publishes `party_updated`. `409` once the encounter has started: from then on only the dungeon master's tools change the party. `422` for a party that does not fit. |
 
 One table, one session, in one process. The session lives as long as the
@@ -104,6 +105,11 @@ in it.
 | `credential_mismatch` | The CLI reported a different credential than the chosen mode, so the turn was stopped before anything reached the model ([ADR-0007](adr/0007-model-credentials.md)). |
 | `usage_limit_reached` | The subscription's usage limit — the message names the switch to the API key — or the API key's rate limit. |
 
+The `message` is English and written for whoever runs the backend: it names
+the mode and what to do, and the backend's terminal logs it too. The page does
+not show it; it shows its own text for the `code`, in the table's language,
+and points to the terminal for the details.
+
 The credential mode itself is not on the table's stream. It is read and
 switched through `GET` / `PUT /api/session/credentials` (`{"mode":
 "subscription" | "api_key"}`), which answer with the mode and whether a key is
@@ -117,7 +123,8 @@ or `null` when the action is the table's rather than one character's. The
 client preselects whoever's turn it is.
 
 A roll has no field of its own. The client's dice block appends it to `text`
-as a line — `d20: 14 + 5 = 19`, `d20: 14 − 1 = 13`, `d8: 6` — the same whether
+as a line — `d20: 14 + 5 = 19`, `d20: 14 − 1 = 13`, `d8: 6`, with the die
+named in the table's language (`W20` in German) — the same whether
 the die was rolled at the table or by the client at the player's click.
 
 ## Entering the party

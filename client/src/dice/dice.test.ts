@@ -38,15 +38,19 @@ describe('rollDie', () => {
 
 describe('rollLine', () => {
   it('shows face, modifier and total', () => {
-    expect(rollLine(20, 14, 5)).toBe('d20: 14 + 5 = 19')
+    expect(rollLine('d20', 14, 5)).toBe('d20: 14 + 5 = 19')
   })
 
   it('subtracts a negative modifier with a true minus sign', () => {
-    expect(rollLine(20, 14, -1)).toBe('d20: 14 − 1 = 13')
+    expect(rollLine('d20', 14, -1)).toBe('d20: 14 − 1 = 13')
   })
 
   it('shows the face alone for +0', () => {
-    expect(rollLine(8, 6, 0)).toBe('d8: 6')
+    expect(rollLine('d8', 6, 0)).toBe('d8: 6')
+  })
+
+  it('names the die as the table does', () => {
+    expect(rollLine('W20', 14, 5)).toBe('W20: 14 + 5 = 19')
   })
 })
 

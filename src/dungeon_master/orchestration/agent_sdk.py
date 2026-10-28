@@ -75,7 +75,7 @@ class AgentSdkDungeonMaster:
     ) -> None:
         setup = adventure.encounter_setup(encounter_id)
         self._system_prompt = system_prompt(
-            settings.narration_language, setup, adventure.monster(setup.opponent_id)
+            settings.language, setup, adventure.monster(setup.opponent_id)
         )
         self._model = settings.model
         self._agent_dir = settings.agent_dir

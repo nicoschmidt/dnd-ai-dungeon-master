@@ -73,7 +73,10 @@ map grid later. It renders only what the backend sends it, which is how hidden
 information stays hidden. A dice block in the input turns a roll into a line
 of the declared action's text — a roll made at the table, or one the client
 makes at a player's click; the backend cannot tell them apart and never rolls
-for a player. It receives state, never markup, which is what keeps
+for a player. Every string it shows comes from a dictionary in the table's
+language, which it asks the backend for before it renders anything; the
+narration is in that language because the dungeon master is told to use it.
+It receives state, never markup, which is what keeps
 it replaceable — by a client on a tablet, or eventually a native one — without
 the backend changing.
 

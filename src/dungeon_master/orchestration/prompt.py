@@ -8,6 +8,10 @@ from ..adventure.models import EncounterSetup, Monster
 from ..events.contract import DeclaredAction
 from ..session.party import Character
 from ..session.state import Encounter
+from ..settings import Language
+
+# The prompt stays English; only the narration it asks for changes.
+LANGUAGE_NAMES: dict[Language, str] = {"de": "German", "en": "English"}
 
 SYSTEM_PROMPT = """\
 You are the dungeon master for a group of friends playing Dungeons & Dragons at \
@@ -57,9 +61,9 @@ The opponent is {opponent_name}. Its attacks: {attacks}.
 """
 
 
-def system_prompt(language: str, setup: EncounterSetup, opponent: Monster) -> str:
+def system_prompt(language: Language, setup: EncounterSetup, opponent: Monster) -> str:
     return SYSTEM_PROMPT.format(
-        language=language,
+        language=LANGUAGE_NAMES[language],
         opponent_id=setup.opponent_id,
         premise=setup.premise,
         opponent_name=opponent.name,

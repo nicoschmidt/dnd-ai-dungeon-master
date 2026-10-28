@@ -13,6 +13,7 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 CredentialMode = Literal["subscription", "api_key"]
+Language = Literal["de", "en"]
 
 
 class Settings(BaseSettings):
@@ -33,7 +34,13 @@ class Settings(BaseSettings):
         ),
     )
     model: str = "claude-opus-5"
-    narration_language: str = "German"
+    language: Language = Field(
+        default="de",
+        description=(
+            "What the table reads: the narration and every string of the client. Fixed "
+            "for the session; a different language is a restart."
+        ),
+    )
     dungeon_master: Literal["agent", "stand_in"] = Field(
         default="agent",
         description="`stand_in` answers without a model: for development without credentials.",

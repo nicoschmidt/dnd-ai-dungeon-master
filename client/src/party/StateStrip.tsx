@@ -1,4 +1,5 @@
 import type { Character, Encounter } from '../contract/index.ts'
+import { useStrings } from '../language/strings.ts'
 import { actingCharacterId, currentCombatant } from '../stream/tableState.ts'
 import { hitPointSummary, roundLabel } from './presentation.ts'
 
@@ -12,25 +13,26 @@ interface Props {
 // line, then one chip per character with their hit points, scrolling
 // sideways. Rendered from the same state as the pane, and from nothing else.
 export function StateStrip({ party, encounter }: Props) {
+  const t = useStrings()
   const acting = actingCharacterId(encounter)
   const current = currentCombatant(encounter)
 
   return (
-    <section className="state-strip" aria-label="State">
+    <section className="state-strip" aria-label={t.state.label}>
       {encounter && (
         <p className="summary">
-          {current && <strong>{current.name} on turn · </strong>}
-          {roundLabel(encounter)}
+          {current && <strong>{current.name} {t.state.onTurn} · </strong>}
+          {roundLabel(encounter, t)}
         </p>
       )}
       {party.length > 0 && (
-        <ul aria-label="Characters">
+        <ul aria-label={t.state.characters}>
           {party.map((character) => (
             <li
               key={character.id}
               className={character.current_hit_points === 0 ? 'down' : undefined}
               aria-current={character.id === acting ? 'true' : undefined}
-              title={hitPointSummary(character)}
+              title={hitPointSummary(character, t)}
             >
               <span>{character.name}</span>
               <span>
