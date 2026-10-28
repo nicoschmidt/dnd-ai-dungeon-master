@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { type CharacterRow, emptyRow, validateParty } from './validateParty.ts'
+import { de } from '../language/de.ts'
+import { en } from '../language/en.ts'
+import { type CharacterRow, emptyRow, validateParty as validate } from './validateParty.ts'
+
+function validateParty(rows: CharacterRow[]) {
+  return validate(rows, en.validation)
+}
 
 function row(overrides: Partial<CharacterRow> = {}): CharacterRow {
   return {
@@ -60,6 +66,13 @@ describe('validateParty', () => {
 
     expect(result.entry).toBeNull()
     expect(result.party).toHaveLength(1)
+  })
+
+  it('words its messages in the table’s language', () => {
+    const result = validate([row({ name: 'Brann' }), row({ name: 'brann', level: '0' })], de.validation)
+
+    expect(result.rows[1].level).toBe('Die Stufe ist 1 bis 20.')
+    expect(result.party).toEqual(['Zwei Charaktere heißen brann.'])
   })
 
   it('accepts an empty party', () => {

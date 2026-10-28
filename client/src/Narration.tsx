@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 
 import type { Character } from './contract/index.ts'
+import { useStrings } from './language/strings.ts'
 import { Avatar } from './party/Avatar.tsx'
 import type { Turn } from './stream/tableState.ts'
 
@@ -16,6 +17,7 @@ const AT_END = 16
 // The story so far. It follows new text while the reader is at its end, and
 // stays where it is while the reader has scrolled up to read something again.
 export function Narration({ turns, party }: Props) {
+  const t = useStrings()
   const pane = useRef<HTMLElement>(null)
   const following = useRef(true)
 
@@ -33,12 +35,12 @@ export function Narration({ turns, party }: Props) {
     <section
       ref={pane}
       className="narration"
-      aria-label="Narration"
+      aria-label={t.narration.label}
       aria-live="polite"
       onScroll={noteWhereTheReaderIs}
     >
       <div className="column">
-        {turns.length === 0 && <p className="empty">The story begins with what you do.</p>}
+        {turns.length === 0 && <p className="empty">{t.narration.empty}</p>}
         {turns.map((turn) => {
           const speaker = party.find((c) => c.id === turn.action.character_id)
           return (

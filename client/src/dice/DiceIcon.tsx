@@ -22,7 +22,7 @@ interface Props {
   size?: number
 }
 
-// Decorative: the button around it carries the name ("d20").
+// Decorative: the button around it carries the name ("d20", "W20").
 export function DiceIcon({ sides, size = 24 }: Props) {
   return (
     <svg

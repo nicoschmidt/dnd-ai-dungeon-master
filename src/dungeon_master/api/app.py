@@ -10,7 +10,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -21,7 +21,7 @@ from ..orchestration.agent_sdk import AgentSdkDungeonMaster
 from ..orchestration.credentials import CredentialSwitch
 from ..orchestration.session import TableSession
 from ..orchestration.stand_in import StandInDungeonMaster
-from ..settings import Settings
+from ..settings import Language, Settings
 from . import session
 
 logger = logging.getLogger(__name__)
@@ -32,12 +32,22 @@ class Health(BaseModel):
     status: str
 
 
+class TableLanguage(BaseModel):
+    language: Language
+
+
 router = APIRouter(prefix="/api")
 
 
 @router.get("/health")
 def health() -> Health:
     return Health(status="ok")
+
+
+@router.get("/language")
+def language(request: Request) -> TableLanguage:
+    """The table's language, `DM_LANGUAGE`. The client reads it before it renders anything."""
+    return TableLanguage(language=request.app.state.language)
 
 
 def create_app(
@@ -81,6 +91,7 @@ def create_app(
     app = FastAPI(title="AI Dungeon Master", lifespan=lifespan)
     app.state.session = table
     app.state.credentials = credentials
+    app.state.language = settings.language
     app.include_router(router)
     app.include_router(session.router)
 

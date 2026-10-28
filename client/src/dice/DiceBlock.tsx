@@ -1,5 +1,6 @@
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 
+import { useStrings } from '../language/strings.ts'
 import { DICE, MODIFIERS, formatModifier, rollDie, rollLine } from './dice.ts'
 import { DiceIcon } from './DiceIcon.tsx'
 
@@ -19,6 +20,7 @@ type Step =
 // let the screen roll it), then the modifier. The line it makes is appended to
 // the action's text, where it can still be changed before it is declared.
 export function DiceBlock({ disabled, onLine, roll = rollDie }: Props) {
+  const t = useStrings()
   const [step, setStep] = useState<Step>({ kind: 'dice' })
   const block = useRef<HTMLDivElement>(null)
   // Focus follows a step only when the player moved there, never on mount.
@@ -49,21 +51,21 @@ export function DiceBlock({ disabled, onLine, roll = rollDie }: Props) {
 
   function finish(sides: number, face: number, modifier: number) {
     setStep({ kind: 'dice' })
-    onLine(rollLine(sides, face, modifier))
+    onLine(rollLine(t.dice.die(sides), face, modifier))
   }
 
   return (
-    <div className="dice" ref={block} role="group" aria-label="Dice" onKeyDown={onKey}>
+    <div className="dice" ref={block} role="group" aria-label={t.dice.group} onKeyDown={onKey}>
       {step.kind === 'dice' && (
         <>
-          <p className="caption">Enter a roll</p>
+          <p className="caption">{t.dice.choose}</p>
           <div className="dice-grid">
             {DICE.map((sides) => (
               <button
                 key={sides}
                 type="button"
-                aria-label={`d${sides}`}
-                title={`d${sides}`}
+                aria-label={t.dice.die(sides)}
+                title={t.dice.die(sides)}
                 disabled={disabled}
                 data-focus={step.from === sides ? '' : undefined}
                 onClick={() => go({ kind: 'face', sides })}
@@ -77,9 +79,9 @@ export function DiceBlock({ disabled, onLine, roll = rollDie }: Props) {
 
       {step.kind === 'face' && (
         <>
-          <p className="caption">d{step.sides}: what came up?</p>
+          <p className="caption">{t.dice.face(t.dice.die(step.sides))}</p>
           <div className="dice-grid">
-            <BackButton label="Back to the dice" onClick={back} />
+            <BackButton label={t.dice.backToDice} onClick={back} />
             {Array.from({ length: step.sides }, (_, i) => i + 1).map((face) => (
               <button
                 key={face}
@@ -96,7 +98,7 @@ export function DiceBlock({ disabled, onLine, roll = rollDie }: Props) {
               onClick={() => go({ kind: 'modifier', sides: step.sides, face: roll(step.sides) })}
             >
               <DiceIcon sides={step.sides} size={18} />
-              Roll
+              {t.dice.roll}
             </button>
           </div>
         </>
@@ -104,11 +106,9 @@ export function DiceBlock({ disabled, onLine, roll = rollDie }: Props) {
 
       {step.kind === 'modifier' && (
         <>
-          <p className="caption">
-            d{step.sides}: {step.face} · modifier?
-          </p>
+          <p className="caption">{t.dice.modifier(t.dice.die(step.sides), step.face)}</p>
           <div className="dice-grid">
-            <BackButton label="Back to the faces" onClick={back} />
+            <BackButton label={t.dice.backToFaces} onClick={back} />
             {MODIFIERS.map((modifier) => (
               <button
                 key={modifier}

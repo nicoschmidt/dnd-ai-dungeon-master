@@ -73,6 +73,15 @@ not the chosen one. `DM_MODEL` picks the model (default `claude-opus-5`).
 Without any credential, `DM_DUNGEON_MASTER=stand_in` runs a stand-in that only
 echoes what you declare.
 
+### The table's language
+
+`DM_LANGUAGE` sets what the table reads: the narration, and every label,
+button and message on the screen. It is `de` (the default) or `en`; any other
+value stops the backend at its start with a message naming the two. There is
+no switch in the interface: to change the language, change `.env`, restart
+the backend and reload the page. Prompts, tool names and the journal stay
+English. The stand-in's echo is English in both.
+
 ### At the table: one process
 
 ```bash

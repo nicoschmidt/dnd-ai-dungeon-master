@@ -1,4 +1,5 @@
 import type { Character, CharacterEntry, PartyEntry } from '../contract/index.ts'
+import type { Strings } from '../language/strings.ts'
 
 // One character as the form holds it: every field as typed.
 export interface CharacterRow {
@@ -50,7 +51,11 @@ function integer(text: string): number | null {
 
 // The client's half of "validated at both ends": the same constraints the
 // backend's CharacterEntry and PartyEntry enforce, checked before sending.
-export function validateParty(rows: CharacterRow[]): PartyValidation {
+// The messages are in the table's language.
+export function validateParty(
+  rows: CharacterRow[],
+  messages: Strings['validation'],
+): PartyValidation {
   const rowErrors: RowErrors[] = []
   const characters: CharacterEntry[] = []
 
@@ -64,17 +69,17 @@ export function validateParty(rows: CharacterRow[]): PartyValidation {
     const current = row.current_hit_points.trim() === '' ? null : integer(row.current_hit_points)
     const temporary = integer(row.temporary_hit_points)
 
-    if (!name) errors.name = 'A name is needed.'
-    if (!characterClass) errors.character_class = 'A class is needed.'
-    if (level === null || level < 1 || level > 20) errors.level = 'Level is 1 to 20.'
-    if (armourClass === null || armourClass < 0) errors.armour_class = 'A whole number, 0 or more.'
-    if (maximum === null || maximum < 1) errors.max_hit_points = 'A whole number, 1 or more.'
+    if (!name) errors.name = messages.name
+    if (!characterClass) errors.character_class = messages.characterClass
+    if (level === null || level < 1 || level > 20) errors.level = messages.level
+    if (armourClass === null || armourClass < 0) errors.armour_class = messages.zeroOrMore
+    if (maximum === null || maximum < 1) errors.max_hit_points = messages.oneOrMore
     if (row.current_hit_points.trim() !== '' && (current === null || current < 0)) {
-      errors.current_hit_points = 'A whole number, 0 or more — or empty for the maximum.'
+      errors.current_hit_points = messages.currentHitPoints
     } else if (current !== null && maximum !== null && current > maximum) {
-      errors.current_hit_points = 'Cannot be more than the maximum.'
+      errors.current_hit_points = messages.aboveMaximum
     }
-    if (temporary === null || temporary < 0) errors.temporary_hit_points = 'A whole number, 0 or more.'
+    if (temporary === null || temporary < 0) errors.temporary_hit_points = messages.zeroOrMore
 
     rowErrors.push(errors)
     if (Object.keys(errors).length === 0) {
@@ -94,7 +99,7 @@ export function validateParty(rows: CharacterRow[]): PartyValidation {
   const seen = new Set<string>()
   for (const row of rows) {
     const key = row.name.trim().toLocaleLowerCase()
-    if (key && seen.has(key)) partyErrors.push(`Two characters are called ${row.name.trim()}.`)
+    if (key && seen.has(key)) partyErrors.push(messages.sameName(row.name.trim()))
     seen.add(key)
   }
 

@@ -163,6 +163,7 @@ def test_a_copied_env_example_starts_on_the_defaults() -> None:
 
     assert (loaded.credential_mode, loaded.anthropic_api_key) == ("subscription", None)
     assert loaded.model == "claude-opus-5"
+    assert loaded.language == "de"
 
 
 def test_the_key_is_read_from_its_own_variable_only(monkeypatch: pytest.MonkeyPatch) -> None:

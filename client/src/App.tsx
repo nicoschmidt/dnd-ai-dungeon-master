@@ -2,20 +2,15 @@ import { useState } from 'react'
 
 import { ActionForm } from './ActionForm.tsx'
 import type { DeclaredAction } from './contract/index.ts'
+import { useStrings } from './language/strings.ts'
 import { Narration } from './Narration.tsx'
 import { PartyDialog } from './party/PartyDialog.tsx'
 import { StateStrip } from './party/StateStrip.tsx'
 import { StatusPanel } from './party/StatusPanel.tsx'
-import { type Connection, useTableStream } from './stream/useTableStream.ts'
-
-const CONNECTION_LABEL: Record<Connection, string> = {
-  connecting: 'connecting…',
-  open: 'connected',
-  reconnecting: 'connection lost, reconnecting…',
-  closed: 'disconnected — reload the page',
-}
+import { useTableStream } from './stream/useTableStream.ts'
 
 function App() {
+  const t = useStrings()
   const { state, connection } = useTableStream()
   const [sendError, setSendError] = useState<string | null>(null)
   const [editingParty, setEditingParty] = useState(false)
@@ -34,11 +29,7 @@ function App() {
       setSendError(null)
       return true
     }
-    setSendError(
-      response?.status === 409
-        ? 'The dungeon master is still answering the last action.'
-        : 'The action did not reach the dungeon master. Try again.',
-    )
+    setSendError(response?.status === 409 ? t.send.busy : t.send.failed)
     return false
   }
 
@@ -53,25 +44,25 @@ function App() {
           <p className="fight-pill">
             <span className="dot" aria-hidden="true" />
             <span>
-              Fight against <strong>{fight.opponent_name}</strong>
+              {t.header.fightAgainst} <strong>{fight.opponent_name}</strong>
             </span>
             <span className="round">
-              · {fight.round === 0 ? 'rolling initiative' : `round ${fight.round}`}
+              · {fight.round === 0 ? t.header.rollingInitiative : t.header.round(fight.round)}
             </span>
           </p>
         )}
         <p className={`connection ${connection}`}>
           <span className="dot" aria-hidden="true" />
-          {CONNECTION_LABEL[connection]}
+          {t.connection[connection]}
         </p>
         {partyFixed ? (
           <button type="button" className="party-button" disabled>
             <LockIcon />
-            The party is fixed for this encounter
+            {t.header.partyFixed}
           </button>
         ) : (
           <button type="button" className="party-button" onClick={() => setEditingParty(true)}>
-            {state.party.length === 0 ? 'Enter the party' : 'Edit the party'}
+            {state.party.length === 0 ? t.header.enterParty : t.header.editParty}
           </button>
         )}
       </header>
@@ -80,7 +71,7 @@ function App() {
 
       <main className="story">
         <Narration turns={state.turns} party={state.party} />
-        {state.error && <p role="alert">{state.error.message}</p>}
+        {state.error && <p role="alert">{t.errors[state.error.code]}</p>}
         {sendError && <p role="alert">{sendError}</p>}
         <ActionForm
           party={state.party}

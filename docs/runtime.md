@@ -87,9 +87,18 @@ With `DM_DUNGEON_MASTER=stand_in`, a `StandInDungeonMaster` takes the agent's
 place and no CLI is ever started. Nothing talks to the Claude API before the
 first declared action.
 
+## Loading the page
+
+Before it renders anything, the page asks the backend for the table's
+language: `GET /api/language`, which answers with `DM_LANGUAGE`. Every label
+and message comes from the dictionary for that language, and `<html lang>`
+follows it. Then it renders and opens the event stream. A different language
+is a restart of the backend and a reload of the page; nothing switches while
+a session runs.
+
 ## One declared action
 
-The page has the table's event stream open from the moment it loads: one
+The page has the table's event stream open from the moment it has rendered: one
 `GET /api/session/stream`, kept open, through which every event of the session
 arrives (see [the event contract](event-contract.md)). A declared action is a
 separate `POST`; everything it causes comes back on that stream.
@@ -185,6 +194,7 @@ over three.
 | Requests, warnings, a failed turn | the backend's terminal |
 | What the model was told, what it answered, every tool call with its arguments and result, every roll, the cost | the Claude Code session transcript |
 | Which credential is in use | `GET /api/session/credentials` |
+| Which language the table is in | `GET /api/language` |
 
 ### The table's events
 

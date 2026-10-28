@@ -193,7 +193,7 @@ async def test_the_agent_gets_only_the_tool_surface_and_none_of_the_maintainers_
 
 async def test_the_premise_and_the_language_are_in_the_system_prompt(tmp_path: Path) -> None:
     query = ScriptedQuery([init(), result()])
-    app, _ = app_with(tmp_path, query, narration_language="German")
+    app, _ = app_with(tmp_path, query, language="de")
 
     await play(app, "x")
 
@@ -201,6 +201,15 @@ async def test_the_premise_and_the_language_are_in_the_system_prompt(tmp_path: P
     assert "Narrate in German" in prompt
     assert iteration_001_repository().encounter_setup("iteration-001").premise in prompt
     assert 'opponent_id "ogre"' in prompt
+
+
+async def test_english_at_the_table_is_english_narration(tmp_path: Path) -> None:
+    query = ScriptedQuery([init(), result()])
+    app, _ = app_with(tmp_path, query, language="en")
+
+    await play(app, "x")
+
+    assert "Narrate in English" in query.calls[0]["options"].system_prompt
 
 
 async def test_each_turn_names_the_actor_and_the_public_state(tmp_path: Path) -> None:

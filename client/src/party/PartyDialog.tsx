@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import type { Character } from '../contract/index.ts'
+import { useStrings } from '../language/strings.ts'
 import { PartyForm } from './PartyForm.tsx'
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 // The party form over the table screen, as a modal dialog: the page behind it
 // is inert, and Escape closes it like Cancel does.
 export function PartyDialog({ party, onClose }: Props) {
+  const t = useStrings()
   const dialog = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export function PartyDialog({ party, onClose }: Props) {
   }, [])
 
   return (
-    <dialog ref={dialog} className="party-dialog" aria-label="The party" onClose={onClose}>
+    <dialog ref={dialog} className="party-dialog" aria-label={t.party.dialog} onClose={onClose}>
       <PartyForm party={party} onClose={onClose} />
     </dialog>
   )

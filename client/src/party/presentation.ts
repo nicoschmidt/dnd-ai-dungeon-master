@@ -1,4 +1,5 @@
 import type { Character, Encounter } from '../contract/index.ts'
+import type { Strings } from '../language/strings.ts'
 
 // How the state is put into words and shapes on the screen. Pure functions
 // of the state, shared by the pane, the strip and the narration.
@@ -11,9 +12,9 @@ export function initials(name: string): string {
   return letters.toUpperCase()
 }
 
-export function roundLabel(encounter: Encounter): string {
-  if (encounter.outcome) return 'Ended'
-  return encounter.round === 0 ? 'Rolling initiative' : `Round ${encounter.round}`
+export function roundLabel(encounter: Encounter, t: Strings): string {
+  if (encounter.outcome) return t.state.ended
+  return encounter.round === 0 ? t.state.rollingInitiative : t.state.round(encounter.round)
 }
 
 // The bar's segments as shares of its width: current and temporary hit points
@@ -27,10 +28,10 @@ export function hitPointBar(character: Character) {
   }
 }
 
-export function hitPointSummary(character: Character): string {
-  const temporary = character.temporary_hit_points
-  return (
-    `${character.current_hit_points} of ${character.max_hit_points} hit points` +
-    (temporary > 0 ? `, ${temporary} temporary` : '')
+export function hitPointSummary(character: Character, t: Strings): string {
+  return t.state.hitPointSummary(
+    character.current_hit_points,
+    character.max_hit_points,
+    character.temporary_hit_points,
   )
 }
