@@ -176,7 +176,7 @@ describe('saving as a file', () => {
     })
     render(<SavePartyButton party={party} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save as file' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save party' }))
 
     expect(clicked).toHaveLength(1)
     const [kind, content] = clicked[0].href.split(',')
