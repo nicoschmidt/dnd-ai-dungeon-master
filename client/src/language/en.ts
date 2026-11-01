@@ -124,6 +124,19 @@ export const en = {
     locked: 'The encounter has started. Only the dungeon master’s tools change the party now.',
     notSaved: 'The party could not be saved.',
     unreachable: 'The backend could not be reached.',
+    saveFile: 'Save as file',
+    loadFile: 'Load from file',
+    fileStem: 'party',
+    // Why a file was not loaded. The form keeps what it had.
+    file: {
+      unreadable: 'The file could not be read.',
+      notJson: 'This is not a party file: it is not JSON.',
+      notParty: 'This is not a party file: it has no list of characters.',
+      notCharacter: 'not a character.',
+      unknownField: (field: string) => `“${field}” is not a field of a party file.`,
+      text: (label: string) => `${label} must be text.`,
+      number: (label: string) => `${label} must be a whole number.`,
+    },
   },
   validation: {
     name: 'A name is needed.',

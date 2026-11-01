@@ -5,6 +5,7 @@ import type { DeclaredAction } from './contract/index.ts'
 import { useStrings } from './language/strings.ts'
 import { Narration } from './Narration.tsx'
 import { PartyDialog } from './party/PartyDialog.tsx'
+import { SavePartyButton } from './party/SavePartyButton.tsx'
 import { StateStrip } from './party/StateStrip.tsx'
 import { StatusPanel } from './party/StatusPanel.tsx'
 import { useTableStream } from './stream/useTableStream.ts'
@@ -55,6 +56,7 @@ function App() {
           <span className="dot" aria-hidden="true" />
           {t.connection[connection]}
         </p>
+        {state.party.length > 0 && <SavePartyButton party={state.party} />}
         {partyFixed ? (
           <button type="button" className="party-button" disabled>
             <LockIcon />

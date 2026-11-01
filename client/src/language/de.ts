@@ -124,6 +124,18 @@ export const de: Strings = {
       'Der Kampf hat begonnen. Die Gruppe ändern jetzt nur noch die Werkzeuge des Dungeon Masters.',
     notSaved: 'Die Gruppe konnte nicht gespeichert werden.',
     unreachable: 'Das Backend war nicht erreichbar.',
+    saveFile: 'Als Datei speichern',
+    loadFile: 'Aus Datei laden',
+    fileStem: 'gruppe',
+    file: {
+      unreadable: 'Die Datei konnte nicht gelesen werden.',
+      notJson: 'Das ist keine Gruppendatei: Sie enthält kein JSON.',
+      notParty: 'Das ist keine Gruppendatei: Sie enthält keine Liste von Charakteren.',
+      notCharacter: 'kein Charakter.',
+      unknownField: (field) => `„${field}“ ist kein Feld einer Gruppendatei.`,
+      text: (label) => `${label} muss ein Text sein.`,
+      number: (label) => `${label} muss eine ganze Zahl sein.`,
+    },
   },
   validation: {
     name: 'Ein Name fehlt.',
