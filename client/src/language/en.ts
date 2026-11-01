@@ -124,8 +124,8 @@ export const en = {
     locked: 'The encounter has started. Only the dungeon master’s tools change the party now.',
     notSaved: 'The party could not be saved.',
     unreachable: 'The backend could not be reached.',
-    saveFile: 'Save as file',
-    loadFile: 'Load from file',
+    saveFile: 'Save party',
+    loadFile: 'Load party',
     fileStem: 'party',
     // Why a file was not loaded. The form keeps what it had.
     file: {

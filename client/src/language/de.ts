@@ -124,8 +124,8 @@ export const de: Strings = {
       'Der Kampf hat begonnen. Die Gruppe ändern jetzt nur noch die Werkzeuge des Dungeon Masters.',
     notSaved: 'Die Gruppe konnte nicht gespeichert werden.',
     unreachable: 'Das Backend war nicht erreichbar.',
-    saveFile: 'Als Datei speichern',
-    loadFile: 'Aus Datei laden',
+    saveFile: 'Gruppe speichern',
+    loadFile: 'Gruppe laden',
     fileStem: 'gruppe',
     file: {
       unreadable: 'Die Datei konnte nicht gelesen werden.',
