@@ -1,7 +1,5 @@
 # 001a — The table screen
 
-Planned. Not started.
-
 ## Goal
 
 The group starts an evening by loading its saved party, and plays on a table
@@ -61,11 +59,60 @@ The pane split is not a cut candidate: it is why this iteration exists.
 
 ## Result
 
-To be written when the goal is reached: what shipped, what did not.
+The goal was reached. The group started an evening from a saved party and
+played it on the new screen, without anyone explaining the tool.
+
+Shipped:
+
+- the table screen: the party's state in its own pane, the narration
+  scrolling on its own, the input pinned below it, a dark theme (#63)
+- the table in the configured language, German by default: the narration and
+  every string of the client, from one value, `DM_LANGUAGE` (#64)
+- the party saved to a file and loaded again; the file is a `PartyEntry` (#65)
+- dice shortcuts beside the input, to enter a roll or let the screen roll it
+  (#72). It was added during the iteration, after #63 had shipped, and took
+  "Digital dice" out of the vision's non-goals: a roll the screen makes at a
+  player's click is the player's roll
+
+Nothing was cut. The cut order above was not needed.
+
+What the iteration left as it is: in review, the file buttons became "Save
+party" and "Load party". In German, the download in the header and the
+dialog's button that enters the party now both read "Gruppe speichern". They
+are never usable at the same time, because the dialog is modal, and so they
+stay as they are.
 
 ## Process learnings
 
-<!-- Inputs: issues labelled `process` since the start, review corrections in
-     the merged pull requests, issues that were cut. Mark every learning:
-     [project] → a change to CLAUDE.md, through an issue here
-     [generic] → the process repository: transfer the issue, or draft one -->
+Inputs: no issue was labelled `process` during 001a. Four pull requests were
+merged: #71, #73, #74 and #75. None carries a review comment. Two carry more
+than one commit. In #71, the second commit rebuilt the screen to the design
+details that arrived as a comment on #63. In #75, the maintainer renamed the
+file buttons and fixed the test that named them. Nothing was cut, and #72 was
+added. Each learning marked `[generic]` is an issue in the process
+repository, nicoschmidt/ai-dev-process.
+
+- [generic] #63 was built twice. The details of the approved mockup came as a
+  comment after the first implementation was done, and the second commit
+  redid the screen to them. For an issue that changes what the users see, the
+  definition of ready does not ask for the visual reference. Process issue:
+  "A user-facing issue is ready only with its visual reference".
+- [generic] #72 was added while the iteration ran. `iterations.md` says how
+  scope is cut, not how it is added. The addition was recorded by hand in
+  this file, in the epic and in the vision. Process issue: "Adding scope to a
+  running iteration has no rule".
+- [generic] The review correction in #75 left a trace because it was made as
+  commits on the pull request's branch ("change button text", "fix test"). A
+  comment that the assistant applies would have left none. Added as a comment
+  to nicoschmidt/ai-dev-process#6.
+- [generic] GitHub rewrites the commits when it merges a pull request, so
+  `git branch -d` refuses the merged branch. Cleaning up took a check that the
+  branch and `main` did not differ, then `git branch -D`. The handover ends
+  with the pull request and gives no command for the cleanup after the merge.
+  Process issue: "The handover gives no cleanup command for after the merge".
+- [project] Each change to the screen was checked in a browser against a
+  stand-in event stream with a fight in progress. The stream was written for
+  that purpose and kept in a scratch directory. It was written twice, because
+  the directory was emptied in between. As tooling it belongs in the
+  repository, and `CLAUDE.md`'s commands would name it. Captured as an idea:
+  "A stand-in stream with a fight in progress, to look at the screen".
