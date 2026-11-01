@@ -105,7 +105,9 @@ Then open <http://127.0.0.1:8000>.
   the error it logs about a cancelled request is that open stream, and
   harmless.
 - The session lives in this process's memory. Stopping it ends the session:
-  the next start begins with an empty party.
+  the next start begins with an empty party. **Save as file** in the header
+  keeps the party, current hit points included, and **Load from file** in the
+  party form brings it back.
 
 ### While developing: two processes
 

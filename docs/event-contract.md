@@ -142,7 +142,23 @@ same name keeps its id and its conditions.
 
 The same constraints are checked in the client before sending
 (`client/src/party/validateParty.ts`) and by Pydantic on arrival. The
-backend's answer is the one that counts; the client shows its messages too.
+backend's answer is the one that counts; the client words a refusal in the
+table's language.
+
+### The party file
+
+A party file is a `PartyEntry`, as JSON, and nothing else: no wrapper, no
+version, no field beyond it. The client saves the party as it stands — at any
+time, also during and after a fight, with the current hit points — and loads
+such a file into the party form, where it can be changed before it is entered
+as above. It leaves out `id` and `conditions`, like every entry; a character
+loaded under the same name keeps both, as one typed in again does.
+
+The file lives wherever the browser saves it; the backend stores nothing and
+sees the file only as the `PUT` it becomes. Loading refuses what `PUT` would
+refuse, before anything is sent: a file that is not JSON, an unknown field, a
+value of the wrong type or out of range, two characters of the same name.
+Fields with a default in `CharacterEntry` may be missing.
 
 ## The dungeon master's tools
 

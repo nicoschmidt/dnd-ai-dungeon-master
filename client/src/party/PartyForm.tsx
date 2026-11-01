@@ -1,7 +1,8 @@
-import { type FormEvent, useState } from 'react'
+import { type ChangeEvent, type FormEvent, useRef, useState } from 'react'
 
 import type { Character } from '../contract/index.ts'
 import { useStrings } from '../language/strings.ts'
+import { readPartyFile } from './partyFile.ts'
 import {
   type CharacterRow,
   emptyRow,
@@ -37,9 +38,29 @@ export function PartyForm({ party, onClose }: Props) {
   const [validation, setValidation] = useState<PartyValidation | null>(null)
   const [serverErrors, setServerErrors] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
+  const [fileProblems, setFileProblems] = useState<string[]>([])
+  const fileInput = useRef<HTMLInputElement>(null)
 
   function update(index: number, key: keyof CharacterRow, value: string) {
     setRows(rows.map((row, i) => (i === index ? { ...row, [key]: value } : row)))
+  }
+
+  // A party file replaces the rows, to be changed and saved like typed ones.
+  // A file that is not a party is refused, and the rows stay as they were.
+  async function load(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = '' // so that the same file can be chosen again
+    if (!file) return
+    const text = await file.text().catch(() => null)
+    const result = text === null ? { problems: [t.party.file.unreadable] } : readPartyFile(text, t)
+    if ('rows' in result) {
+      setRows(result.rows)
+      setValidation(null)
+      setServerErrors([])
+      setFileProblems([])
+    } else {
+      setFileProblems(result.problems)
+    }
   }
 
   async function save(event: FormEvent) {
@@ -47,6 +68,7 @@ export function PartyForm({ party, onClose }: Props) {
     const result = validateParty(rows, t.validation)
     setValidation(result)
     setServerErrors([])
+    setFileProblems([])
     if (!result.entry) return
 
     setSaving(true)
@@ -70,7 +92,7 @@ export function PartyForm({ party, onClose }: Props) {
     }
   }
 
-  const messages = [...(validation?.party ?? []), ...serverErrors]
+  const messages = [...fileProblems, ...(validation?.party ?? []), ...serverErrors]
 
   return (
     <form className="party-form" onSubmit={save} noValidate>
@@ -79,6 +101,20 @@ export function PartyForm({ party, onClose }: Props) {
           <h2>{t.party.heading}</h2>
           <p>{t.party.intro}</p>
         </div>
+        <input
+          ref={fileInput}
+          type="file"
+          accept=".json,application/json"
+          hidden
+          onChange={(event) => void load(event)}
+        />
+        <button type="button" className="secondary" onClick={() => fileInput.current?.click()}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 15V4M7 9l5-5 5 5M5 20h14" />
+          </svg>
+          {t.party.loadFile}
+        </button>
       </div>
       <div className="rows-box">
         <div className="rows">
