@@ -33,6 +33,7 @@ keep their structure:
 | --- | --- | --- |
 | [001](001-one-combat-encounter.md) | One combat encounter against one opponent | The engine: streaming, the tool boundary, deterministic rules, the party panel |
 | [001a](001a-the-table-screen.md) | A table screen for an evening of play | The table: state in view, the group's language, a party that is saved |
+| [001b](001b-iterations-as-milestones.md) | Iterations as milestones | A session reads readiness and the plan from issues and milestones; the upgrade path left three gaps |
 | [002](002-one-scene-from-our-adventure.md) | One scene from the maintainer's own adventure | The content boundary: schema, loader, hidden and revealed information |
 | [003](003-one-evening-of-play.md) | One evening through one chapter | Ingest from the scan, scene progression, resuming after a restart; planned to reach the MVP |
 
