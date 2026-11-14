@@ -1,43 +1,29 @@
 # NNN — <short goal>
 
-<!-- Copy to docs/iterations/NNN-<short-goal>.md before the iteration starts.
-     Goal and Out of scope are written first; Scope grows as issues are
-     written; Result and Process learnings are the retro. Status is on the
-     board, not here. -->
+<!-- The retro of one iteration. Copy to docs/iterations/NNN-<short-goal>.md
+     when its milestone closes. The plan was the milestone: its goal in the
+     description, its scope the issues in it. -->
 
-Planned. Not started.
+Milestone: <link to the milestone, in every repository that had one>
 
 ## Goal
 
-<One sentence: what the users can do afterwards that they could not do before.
-It meets the done criterion in CLAUDE.md.>
-
-## Why this slice
-
-<What it proves, and why it comes now.>
-
-## Scope
-
-Epic: #<n>.
-
-- #<n> — <title>
-
-## Out of scope
-
-- <deferred, and why>
-
-## If it grows
-
-<What gets cut first, in order. Cutting is planned before it is needed.>
+<The milestone's goal, one sentence, as it stood at the end.>
 
 ## Result
 
-To be written when the goal is reached: what shipped, what did not.
+<What shipped against the goal, and whether it meets the done criterion in
+CLAUDE.md. What was added while it ran, and why.>
+
+## Moved on
+
+- #<n> — <title>: <to which milestone, or back to refinement, and why>
 
 ## Process learnings
 
-<!-- Inputs: issues labelled `process` since the start, review corrections in
-     the merged pull requests, issues that were cut. Mark every learning:
+<!-- Inputs: issues labelled `process` since the start, the milestone's issues
+     and the review corrections in their merged pull requests, what moved on.
+     Mark every learning:
      [project] → a change to CLAUDE.md, through an issue here
      [generic] → the process repository: transfer the issue, or draft one -->
 
