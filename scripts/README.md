@@ -5,23 +5,18 @@ Two kinds live here.
 **`scripts/process/`** is managed by
 [ai-dev-process](https://github.com/nicoschmidt/ai-dev-process) and never
 edited in this repository (`.claude/rules/process/`, `.ai-dev-process.lock`):
-the board helpers behind every handover, idea capture, labels, the check that
-managed files are unchanged, and their stand-in tests.
+the issue and milestone helpers behind every handover, idea capture, labels,
+the check that managed files are unchanged, and their stand-in tests.
 
 ```bash
-bash scripts/process/show-board.sh                   # every board field and option, read-only
-bash scripts/process/set-issue-fields.sh 13 S Backlog
 bash scripts/process/capture-idea.sh "<title>"       # an issue labelled idea
 bash scripts/process/check-kit.sh                    # managed files unchanged
-bash scripts/process/test-gh-board.sh
+bash scripts/process/test-gh-issues.sh
 ```
 
-The board helpers need the `project` scope, which `gh auth login` does not
-grant:
-
-```bash
-gh auth refresh -s project
-```
+`gh-issues.sh` is sourced, not run: `create_issue`, `set_milestone` and
+`ensure_milestone` hand an issue over with its label and milestone set. The
+helpers need `gh` and `jq`, and no scope beyond what `gh auth login` grants.
 
 **Everything else here** belongs to this project.
 
@@ -54,8 +49,9 @@ One `PROVENANCE.md` covers everything below its `fixtures` directory.
 
 Tooling belongs here. Content does not. A drafted issue body, a pull request
 body, or a one-off script that carries either, lives **beside** the
-repository (`../pr-<n>-body.md`, `../create-*.sh`) and is never committed;
-those one-off scripts source `scripts/process/gh-board.sh` from here.
+repository, in the project folder (`../pr-<n>-body.md`, `../create-*.sh`),
+and is never committed; those one-off scripts source
+`scripts/process/gh-issues.sh` from here.
 
 ## In CI
 

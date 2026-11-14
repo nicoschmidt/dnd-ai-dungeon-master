@@ -60,3 +60,15 @@ Explicitly not in scope (for now):
 A group sits down, opens the app, and plays for three hours without anyone
 having to explain the tool to anyone. Afterwards they want to play again,
 and nobody misses having a human game master more than occasionally.
+
+## MVP
+
+The first state after which the group would choose to spend an evening
+playing with the application: it plays a whole evening through one chapter of
+the maintainer's own adventure. Several scenes follow one another, the AI
+keeps track of where the party is and what it knows, and when the evening
+ends the session resumes where it stopped.
+
+The MVP is not an iteration. Several iterations, each a milestone, reach it;
+[003](iterations/003-one-evening-of-play.md) is planned as the one that
+arrives there.
