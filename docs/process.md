@@ -101,14 +101,13 @@ a command, is a defect — say so.
 
    ```bash
    cd <repository>
-   git switch main && git pull
-   git branch -d <branch>                  # local
-   git push origin --delete <branch>       # remote, if it still exists
-   git fetch --prune
+   bash scripts/process/after-merge.sh <branch>
    cd ..
    ```
 
-   `gh repo edit --delete-branch-on-merge` makes the remote half unnecessary.
+   It deletes the branch only where it is at the merged pull request's last
+   commit, under any merge method, and keeps it with the reason otherwise.
+   `gh repo edit --delete-branch-on-merge` saves it the remote half.
 
 ## Several repositories
 
@@ -127,11 +126,13 @@ says what lives where. In short:
 
 ## When something goes wrong
 
-**Branch has fallen behind `main`**
+**Branch has fallen behind `main`**, or it started before the previous pull
+request was merged:
 
 ```bash
-git switch main && git pull
-git switch <branch> && git rebase main
+git fetch origin
+git switch <branch> && git rebase origin/main
+git push --force-with-lease      # only if the branch was pushed already
 ```
 
 **Committed on `main` by accident** — do not push. The pre-commit hook should

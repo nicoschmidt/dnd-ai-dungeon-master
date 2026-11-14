@@ -77,6 +77,13 @@ session stops and says which item is missing.
   from GitHub; never predict it.
 - One pull request per issue. The body references the issue (`Closes #n`) and
   fills in the template rather than restating the commits.
+- A branch starts from `main` after the previous pull request is merged. One
+  that had to start earlier is rebased onto `main` after that merge, and
+  pushed with `--force-with-lease` if it was pushed already. That holds under
+  every merge method, so the process does not need to know which one the
+  maintainer uses.
+- After the merge, `scripts/process/after-merge.sh <branch>` cleans up. It
+  deletes a branch only where it is at the merged pull request's last commit.
 - **Never merge your own pull request.** The maintainer reviews and merges.
 - Commits use Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`,
   `refactor:`, `chore:`. The message carries the reasoning — a chat window

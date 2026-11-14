@@ -38,6 +38,9 @@ and the **iteration box** are process parameters in `CLAUDE.md`.
   closed. Small iterations and this move replace a cut order planned ahead.
 - **When the box is time**: the milestone has a due date. The iteration ends
   on it, and what is open moves on in the same way.
+- **An upgrade of ai-dev-process** happens between iterations, so it is the
+  first issue of the next iteration's milestone. It needs no iteration of its
+  own; what it teaches goes into that iteration's retro.
 
 ## Every iteration ends with a retro
 
