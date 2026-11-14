@@ -11,6 +11,7 @@ the check that managed files are unchanged, and their stand-in tests.
 ```bash
 bash scripts/process/capture-idea.sh "<title>"       # an issue labelled idea
 bash scripts/process/check-kit.sh                    # managed files unchanged
+bash scripts/process/after-merge.sh <branch>         # after a merge: main up to date, the merged branch deleted
 bash scripts/process/test-gh-issues.sh
 ```
 
