@@ -58,12 +58,11 @@ genuinely bad afternoon, which is why the rule exists.
 | Repository language | English |
 | Conversation language | German |
 | Branch types | feat, fix, docs, chore |
-| Board fields (facts) | Size (the board may call it Größe), Iteration |
 | Process repository | nicoschmidt/ai-dev-process |
 
 This repository is the whole project: it is its own home repository, with no
-members. The board is named in `.ai-dev-process.conf`, where the scripts read
-it.
+members. `.ai-dev-process.conf` says so, where the scripts read it. Iterations
+are milestones (`.claude/rules/process/iterations.md`).
 
 ## Definition of done additions
 

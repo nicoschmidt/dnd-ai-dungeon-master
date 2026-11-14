@@ -1,52 +1,44 @@
 # Iterations
 
-One file per iteration, named `NNN-<short-goal>.md`, copied from
-[TEMPLATE.md](TEMPLATE.md). The rules are in
+An iteration is a milestone: `NNN <short goal>`, its goal in the description,
+its scope the issues in it. The open milestones are the plan; the current
+iteration is the open one with the lowest number. The rules are in
 `.claude/rules/process/iterations.md`.
 
-Each iteration states:
+This folder holds what a milestone cannot: one retro per finished iteration,
+named `NNN-<short-goal>.md` and copied from [TEMPLATE.md](TEMPLATE.md) when the
+milestone closes. What shipped, what was added or moved on, and what the
+iteration taught.
 
-- **Goal** — one sentence. What can we do at the end that we could not do
-  before?
-- **Scope** — the issues pulled in, by number.
-- **Out of scope** — what was deliberately deferred, and why.
-- **Result** — filled in at the end: what shipped, what did not.
-- **Process learnings** — the retro, from the `process` issues, the reviews
-  and the cuts; each marked `[project]` or `[generic]`.
+The larger aim the iterations work towards, the MVP, is in
+[docs/vision.md](../vision.md).
 
-Iteration files written before ai-dev-process was adopted keep their
-structure, and gain a **Process learnings** section when their retro is
-written.
+## Files written before iterations were milestones
 
-Iterations are tracked on the GitHub Project board via the `Iteration`
-field. This folder holds the narrative that the board cannot.
+Until ai-dev-process 0.3.0 an iteration was planned in its file here and
+tracked on a project board, with an epic issue for its scope. Those files
+keep their structure:
 
-## Planned iterations and the MVP
+- The iterations up to 001a are finished. Their files are their retros, and
+  the epics they name are closed.
+- [002](002-one-scene-from-our-adventure.md) and
+  [003](003-one-evening-of-play.md) were written as plans, before their
+  iterations started. They stay as they are; **Result** and **Process
+  learnings** are filled in when the milestone closes. Where such a file and
+  its milestone disagree about scope, the milestone is right.
 
-An iteration is a unit of work: one goal, and it ends when that goal is
-playable. The **MVP** is not a unit of work. It is a milestone — the first
-iteration after which the group would choose to spend an evening playing with
-the application — and it is reached by iterations like any other result.
+## The iterations so far
 
-The iterations up to the MVP are planned ahead, so that each one knows what the
-next needs from it. A planned iteration gets its file here before it starts,
-with **Goal** and **Out of scope** filled in; **Scope** grows as issues are
-written for it and is settled when the iteration starts; **Result** is written
-at the end, as always. The goals of planned iterations change when an earlier
-one teaches something — that is what planning ahead is for, not a failure of
-it.
-
-| Iteration | Goal in brief | Proves |
+| Iteration | Goal in brief | Proves, or learned |
 | --- | --- | --- |
 | [001](001-one-combat-encounter.md) | One combat encounter against one opponent | The engine: streaming, the tool boundary, deterministic rules, the party panel |
 | [001a](001a-the-table-screen.md) | A table screen for an evening of play | The table: state in view, the group's language, a party that is saved |
 | [002](002-one-scene-from-our-adventure.md) | One scene from the maintainer's own adventure | The content boundary: schema, loader, hidden and revealed information |
-| [003](003-one-evening-of-play.md) | One evening through one chapter | **The MVP.** Ingest from the scan, scene progression, resuming after a restart |
+| [003](003-one-evening-of-play.md) | One evening through one chapter | Ingest from the scan, scene progression, resuming after a restart; planned to reach the MVP |
 
-An iteration found to be needed between two planned ones takes the number
-before it with a letter, like 001a. Planned numbers are referred to from ADRs,
-code and issues, so they are never shifted.
+An iteration found to be needed between two others takes the number before it
+with a letter, like 001a. Numbers are referred to from ADRs, code and issues,
+so they are never shifted.
 
-Status is not kept here. Which issues are open, in progress or done is on the
-board and in each iteration's epic; this table says only what each iteration
-is for.
+Status is not kept here. Which issues are open or done, and which iteration
+they belong to, is read from the issues and their milestones.
